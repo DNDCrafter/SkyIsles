@@ -1,9 +1,9 @@
 package com.thelastflames.skyisles;
 
-import com.thelastflames.skyisles.Registry.SkyBlocks;
-import com.thelastflames.skyisles.Registry.SkyDimensions;
-import com.thelastflames.skyisles.Registry.SkyItems;
-import com.thelastflames.skyisles.Registry.SkyTileEntities;
+import com.thelastflames.skyisles.registry.SkyBlocks;
+import com.thelastflames.skyisles.registry.SkyDimensions;
+import com.thelastflames.skyisles.registry.SkyItems;
+import com.thelastflames.skyisles.registry.SkyTileEntities;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.dimension.DimensionType;
