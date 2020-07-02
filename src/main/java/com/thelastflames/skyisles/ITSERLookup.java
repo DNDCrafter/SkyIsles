@@ -1,5 +1,6 @@
 package com.thelastflames.skyisles;
 
+import com.thelastflames.skyisles.client.Item.PickaxeISTER;
 import com.thelastflames.skyisles.client.block.IISter;
 import com.thelastflames.skyisles.client.block.ISter;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
@@ -62,6 +63,7 @@ public class ITSERLookup {
 			};
 			map.put("pillar",new ISter(multimaterialteiisterpillar));
 			map.put("lamp_block",new ISter(multimaterialteiisterlamp));
+			map.put("tool_metal_pickaxe", new PickaxeISTER());
 		} catch (Exception ignored) {}
 	}
 	

@@ -1,4 +1,4 @@
-package com.thelastflames.skyisles.tile_entity;
+package com.thelastflames.skyisles.client.gui;
 
 import com.google.common.collect.Lists;
 import net.minecraft.entity.player.PlayerEntity;

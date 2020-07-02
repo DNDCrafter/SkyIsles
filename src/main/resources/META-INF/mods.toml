@@ -45,7 +45,7 @@ a\n\nCredits:Ferocidad897,ThatAngel,DomasLt
 [[dependencies.skyisles]]
     modId="dynamic_rendering"
     mandatory=true
-    versionRange="[1.7,)"
+    versionRange="[1.8,)"
     ordering="NONE"
     side="BOTH"
 

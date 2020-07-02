@@ -2,6 +2,7 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url "https://plugins.gradle.org/m2/" }
+        maven { url 'https://jitpack.io' }
         jcenter()
         mavenCentral()
     }
@@ -13,6 +14,15 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: "com.wynprice.cursemaven"
+
+
+repositories {
+    maven { url = 'https://files.minecraftforge.net/maven' }
+    maven { url "https://plugins.gradle.org/m2/" }
+    maven { url 'https://jitpack.io' }
+    jcenter()
+    mavenCentral()
+}
 
 version = modVersion
 group = modGroup
@@ -92,9 +102,10 @@ dependencies {
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.15.2-31.2.5'
 
-    //TODO:UPDATE TO 2975465
-    deobf fg.deobf("curse.maven:dynamic-renderer:2975465")
-    runtimeOnly fg.deobf("curse.maven:dynamic-renderer:2975465")
-//    runtimeOnly fg.deobf("curse.maven:enchanted-book-redesign:2968446")
-//    runtimeOnly fg.deobf("curse.maven:place-preview:2975672")
+    //TODO:UPDATE TO 2994933
+    deobf fg.deobf("curse.maven:dynamic-renderer:2994933")
+    runtimeOnly fg.deobf("curse.maven:dynamic-renderer:2994933")
+    runtimeOnly fg.deobf("curse.maven:enchanted-book-redesign:2968446")
+    runtimeOnly fg.deobf("curse.maven:place-preview:2975672")
+//    implementation 'com.github.GiantLuigi4:Dynamic_Renderer:-SNAPSHOT'
 }

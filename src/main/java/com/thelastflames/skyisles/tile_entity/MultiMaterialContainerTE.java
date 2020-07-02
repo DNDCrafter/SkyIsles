@@ -1,5 +1,6 @@
 package com.thelastflames.skyisles.tile_entity;
 
+import com.thelastflames.skyisles.client.gui.Inventory;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
 import com.thelastflames.skyisles.utils.MaterialList;
 import com.thelastflames.skyisles.utils.NonNullListWrapper;

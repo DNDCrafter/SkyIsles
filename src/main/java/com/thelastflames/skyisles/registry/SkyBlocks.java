@@ -4,6 +4,7 @@ import com.thelastflames.skyisles.CreativeTabs;
 import com.thelastflames.skyisles.ITSERLookup;
 import com.thelastflames.skyisles.SkyIsles;
 import com.thelastflames.skyisles.blocks.DrawerBlock;
+import com.thelastflames.skyisles.blocks.ForgeBlock;
 import com.thelastflames.skyisles.blocks.LampBlock;
 import com.thelastflames.skyisles.blocks.PillarBlock;
 import com.thelastflames.skyisles.items.DefaultNBTBlockItem;
@@ -27,6 +28,7 @@ public class SkyBlocks {
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<CompoundNBT>("BlockEntityTag",new NBTUtil.NBTObjectHolder<String>("materials","minecraft:iron_ingot;minecraft:gold_ingot").Package())));
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", new LampBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<CompoundNBT>("BlockEntityTag",new NBTUtil.NBTObjectHolder<String>("materials","minecraft:glowstone;minecraft:black_concrete").Package())));
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", new DrawerBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<CompoundNBT>("BlockEntityTag",new NBTUtil.NBTObjectHolder<String>("materials","minecraft:spruce_wood;minecraft:iron_block").Package())));
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> FORGE_BLOCK = registerBlockWithItem("forge_block", new ForgeBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, null);
 	
 	public static BiRegistry<RegistryObject<Block>, RegistryObject<Item>> registerBlockWithItem(String name, Block block, int maxStack, @Nullable ItemGroup group, @Nullable Rarity rarity, @Nullable CompoundNBT defaultNBT) {
 		Item.Properties properties = new Item.Properties();

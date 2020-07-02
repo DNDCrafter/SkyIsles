@@ -1,6 +1,7 @@
 package com.thelastflames.skyisles.utils;
 
 import java.util.ArrayList;
+import java.util.function.BiConsumer;
 
 public class StringyHashMap<T,H> {
 	public ArrayList<T> keys=new ArrayList<>();
@@ -46,5 +47,11 @@ public class StringyHashMap<T,H> {
 	public void add(T key,H object) {
 		keys.add(key);
 		objects.add(object);
+	}
+	
+	public void forEach(BiConsumer<T,H> consumer) {
+		for (int i=0;i<keys.size();i++) {
+			consumer.accept(keys.get(i),objects.get(i));
+		}
 	}
 }
