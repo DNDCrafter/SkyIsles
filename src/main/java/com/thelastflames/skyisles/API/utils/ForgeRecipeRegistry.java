@@ -3,6 +3,7 @@ package com.thelastflames.skyisles.API.utils;
 import com.thelastflames.skyisles.utils.StringyHashMap;
 import net.minecraft.util.ResourceLocation;
 
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 public class ForgeRecipeRegistry {
@@ -13,8 +14,10 @@ public class ForgeRecipeRegistry {
 	}
 	
 	public static void forEach(BiConsumer<ResourceLocation,ToolForgeRecipe> consumer) {
-		System.out.println("h");
-		System.out.println(recipeHashMap.keys.size());
 		recipeHashMap.forEach(consumer);
+	}
+	
+	public static ArrayList<ToolForgeRecipe> getRecipesAsList() {
+		return (ArrayList<ToolForgeRecipe>) recipeHashMap.objects.clone();
 	}
 }

@@ -12,9 +12,9 @@ public interface IMultiMaterialTE {
 	
 	MaterialList getMaterialList();
 	
-	BlockState getBlockState();
+	BlockState mgetBlockState();
 	
-	BlockPos getPos();
+	BlockPos mgetPos();
 	
-	World getWorld();
+	World mgetWorld();
 }

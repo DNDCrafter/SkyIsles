@@ -1,6 +1,6 @@
 package com.thelastflames.skyisles.blocks;
 
-import com.thelastflames.skyisles.Containers.ForgeContainer;
+import com.thelastflames.skyisles.containers.ForgeContainer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SoundType;

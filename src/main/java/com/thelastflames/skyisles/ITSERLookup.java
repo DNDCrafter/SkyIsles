@@ -21,7 +21,7 @@ public class ITSERLookup {
 				try {
 					MultiMaterialTE te=new MultiMaterialTE() {
 						@Override
-						public BlockState getBlockState() {
+						public BlockState mgetBlockState() {
 							return SkyBlocks.PILLAR_BLOCK.getObject1().get().getDefaultState();
 						}
 					};
@@ -31,7 +31,7 @@ public class ITSERLookup {
 				} catch (Exception err) {
 					MultiMaterialTE te=new MultiMaterialTE() {
 						@Override
-						public BlockState getBlockState() {
+						public BlockState mgetBlockState() {
 							return SkyBlocks.PILLAR_BLOCK.getObject1().get().getDefaultState();
 						}
 					};
@@ -43,7 +43,7 @@ public class ITSERLookup {
 				try {
 					MultiMaterialTE te=new MultiMaterialTE() {
 						@Override
-						public BlockState getBlockState() {
+						public BlockState mgetBlockState() {
 							return SkyBlocks.LAMP_BLOCK.getObject1().get().getDefaultState();
 						}
 					};
@@ -53,7 +53,7 @@ public class ITSERLookup {
 				} catch (Exception err) {
 					MultiMaterialTE te=new MultiMaterialTE() {
 						@Override
-						public BlockState getBlockState() {
+						public BlockState mgetBlockState() {
 							return SkyBlocks.LAMP_BLOCK.getObject1().get().getDefaultState();
 						}
 					};

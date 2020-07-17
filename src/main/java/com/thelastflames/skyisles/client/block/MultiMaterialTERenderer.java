@@ -33,34 +33,36 @@ public class MultiMaterialTERenderer extends TileEntityRenderer<TileEntity> {
 	public void render(IMultiMaterialTE tileEntityIn, float partialTicks, @Nonnull IRenderTypeBuffer bufferIn, MatrixStack matrixStackIn, int combinedLightIn, int combinedOverlayIn) {
 		//		Date startTime=new Date();
 		matrixStackIn.push();
-		if (!((DynamicModelBlock)tileEntityIn.getBlockState().getBlock()).preRender(matrixStackIn,tileEntityIn.getPos())) {
-			if (tileEntityIn!=null) {
-				if (tileEntityIn.getBlockState().has(DispenserBlock.FACING)) {
-					Direction dir=tileEntityIn.getBlockState().get(DispenserBlock.FACING);
-					matrixStackIn.rotate(dir.getRotation());
-					if (dir.equals(Direction.NORTH)) {
-						matrixStackIn.translate(-1,-1,-1);
-					} else if (dir.equals(Direction.EAST)) {
-						matrixStackIn.translate(-1,0,-1);
-					} else if (dir.equals(Direction.SOUTH)) {
-						matrixStackIn.translate(0,0,-1);
-					} else if (dir.equals(Direction.WEST)||dir.equals(Direction.DOWN)) {
-						matrixStackIn.translate(0,-1,-1);
+		
+		try {
+			if (!((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).preRender(matrixStackIn,tileEntityIn.mgetPos())) {
+				if (tileEntityIn!=null) {
+					if (tileEntityIn.mgetBlockState().has(DispenserBlock.FACING)) {
+						Direction dir=tileEntityIn.mgetBlockState().get(DispenserBlock.FACING);
+						matrixStackIn.rotate(dir.getRotation());
+						if (dir.equals(Direction.NORTH)) {
+							matrixStackIn.translate(-1,-1,-1);
+						} else if (dir.equals(Direction.EAST)) {
+							matrixStackIn.translate(-1,0,-1);
+						} else if (dir.equals(Direction.SOUTH)) {
+							matrixStackIn.translate(0,0,-1);
+						} else if (dir.equals(Direction.WEST)||dir.equals(Direction.DOWN)) {
+							matrixStackIn.translate(0,-1,-1);
+						}
 					}
 				}
-			}
-			matrixStackIn.push();
-			matrixStackIn.scale(1/16f,1/16f,1/16f);
-//			System.out.println("start"+new Date().getTime());
-			Minecraft.getInstance().getProfiler().startSection("render_multi_material_te");
-			try {
-				PreppedModel mdl=((DynamicModelBlock)tileEntityIn.getBlockState().getBlock()).getModel(((IMultiMaterialTE)tileEntityIn).getMaterialList(),tileEntityIn.getPos(),tileEntityIn.getWorld());
 				matrixStackIn.push();
+				matrixStackIn.scale(1/16f,1/16f,1/16f);
+//			System.out.println("start"+new Date().getTime());
+				Minecraft.getInstance().getProfiler().startSection("render_multi_material_te");
+				try {
+					PreppedModel mdl=((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).getModel(((IMultiMaterialTE)tileEntityIn).getMaterialList(),tileEntityIn.mgetPos(),tileEntityIn.mgetWorld());
+					matrixStackIn.push();
 //				matrixStackIn.rotate(new Quaternion(0,180,0,true));
 //				matrixStackIn.translate(-16,0,-16);
 //				matrixStackIn.scale(1,1,0.01f);
-				Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn);
-				matrixStackIn.pop();
+					Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn);
+					matrixStackIn.pop();
 //				matrixStackIn.push();
 //				matrixStackIn.rotate(new Quaternion(0,90,0,true));
 //				matrixStackIn.translate(-16,0,0);
@@ -79,14 +81,15 @@ public class MultiMaterialTERenderer extends TileEntityRenderer<TileEntity> {
 //				matrixStackIn.scale(1,1,0.01f);
 //				Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn,16777215);
 //				matrixStackIn.pop();
-			} catch (Exception ignored) {
+				} catch (Exception ignored) {
+				}
+				matrixStackIn.pop();
+			} else {
+				((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).render(matrixStackIn,bufferIn,null,((MultiMaterialTE)tileEntityIn));
 			}
-			matrixStackIn.pop();
-		} else {
-			((DynamicModelBlock)tileEntityIn.getBlockState().getBlock()).render(matrixStackIn,bufferIn,null,((MultiMaterialTE)tileEntityIn));
-		}
+		} catch (Throwable err) {}
 		Minecraft.getInstance().getProfiler().endSection();
-		((DynamicModelBlock)tileEntityIn.getBlockState().getBlock()).postRender(matrixStackIn,tileEntityIn.getPos());
+		((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).postRender(matrixStackIn,tileEntityIn.mgetPos());
 		matrixStackIn.pop();
 //		System.out.println("timeSpent"+((new Date().getTime())-startTime.getTime()));
 	}

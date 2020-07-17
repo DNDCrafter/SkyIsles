@@ -2,18 +2,24 @@ package com.thelastflames.skyisles;
 
 import com.thelastflames.skyisles.API.events.recipe.ForgeRecipesEvent;
 import com.thelastflames.skyisles.API.utils.ToolForgeRecipe;
-import com.thelastflames.skyisles.Containers.ForgeContainer;
+import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.registry.SkyDimensions;
 import com.thelastflames.skyisles.registry.SkyItems;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
 import com.thelastflames.skyisles.utils.MaterialList;
+import com.thelastflames.skyisles.utils.client.UserInterfaceUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.Tag;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -96,28 +102,35 @@ public class SkyIsles {
 						(
 								stacks.get(4).getItem().getTags().contains(new ResourceLocation("minecraft:planks"))||
 								stacks.get(4).getItem().getTags().contains(Tags.Items.RODS.getId())||
-								stacks.get(4).getItem().equals(Items.BONE)||
+								stacks.get(4).getItem().getTags().contains(Tags.Items.BONES.getId())||
 								stacks.get(4).getItem().equals(Items.BAMBOO)
 						)&&
 						(stacks.get(5).getItem().equals(stacks.get(1).getItem()))&&
-						(stacks.get(6).getItem().getTags().contains(Tags.Items.LEATHER.getId()))&&
+						(
+								stacks.get(6).getItem().getTags().contains(Tags.Items.LEATHER.getId())||
+								stacks.get(6).getItem().getRegistryName().equals(Items.RABBIT_HIDE.getRegistryName())
+						)&&
 						stacks.get(7).isEmpty()&&
 						stacks.get(8).isEmpty();
 			}
 			
 			@Override
 			public ItemStack getOutput(ArrayList<ItemStack> stacks) {
-				ItemStack stack=new ItemStack(SkyItems.METAL_PICKAXE.get());
-				CompoundNBT nbt=stack.getOrCreateTag();
-				MaterialList list=new MaterialList();
-				
-				nbt.putString("mat_stick_leather",stacks.get(6).getItem().getRegistryName().toString());
-				nbt.putString("mat_head_metal1",stacks.get(1).getItem().getRegistryName().toString());
-				nbt.putString("mat_head_metal2",stacks.get(2).getItem().getRegistryName().toString());
-				nbt.putString("mat_stick_wood",stacks.get(4).getItem().getRegistryName().toString());
-				
-				nbt.putString("materials",list.toString());
-				return stack;
+				if (stacks!=null) {
+					ItemStack stack=new ItemStack(SkyItems.METAL_PICKAXE.get());
+					CompoundNBT nbt=stack.getOrCreateTag();
+					MaterialList list=new MaterialList();
+					
+					nbt.putString("mat_stick_leather",stacks.get(6).getItem().getRegistryName().toString());
+					nbt.putString("mat_head_metal1",stacks.get(1).getItem().getRegistryName().toString());
+					nbt.putString("mat_head_metal2",stacks.get(2).getItem().getRegistryName().toString());
+					nbt.putString("mat_stick_wood",stacks.get(4).getItem().getRegistryName().toString());
+					
+					nbt.putString("materials",list.toString());
+					return stack;
+				} else {
+					return new ItemStack(SkyItems.METAL_PICKAXE.get());
+				}
 			}
 			
 			public boolean checkMetalHead(ItemStack stack) {
@@ -126,8 +139,98 @@ public class SkyIsles {
 						SkyIsles.checkMetalHead(stack);
 			}
 			
+			int indexIngot=0;
+			int indexGem=1;
+			int indexStick=0;
+			int indexLeather=0;
+			int renderCalls=0;
+			
 			@Override
 			public void renderRecipe() {
+				renderCalls++;
+				
+				ArrayList<Item> leather=new ArrayList<>();
+				ArrayList<Item> sticks=new ArrayList<>();
+				ArrayList<Item> head=new ArrayList<>();
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.INGOTS.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.GEMS.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.COBBLESTONE.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.STONE.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : ItemTags.PLANKS.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.BEACON_PAYMENT.getEntries()) {
+					itemITagEntry.populate(head);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.LEATHER.getEntries()) {
+					itemITagEntry.populate(leather);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.BONES.getEntries()) {
+					itemITagEntry.populate(sticks);
+				}
+				
+				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.RODS.getEntries()) {
+					itemITagEntry.populate(sticks);
+				}
+				
+				sticks.add(Items.BAMBOO);
+				leather.add(Items.RABBIT_HIDE);
+				
+				if (renderCalls>=30) {
+					renderCalls=0;
+					indexIngot++;
+					if (indexIngot>=head.size()) {
+						indexIngot=0;
+					}
+					
+					indexLeather++;
+					if (indexLeather>=leather.size()) {
+						indexLeather=0;
+					}
+					
+					indexStick++;
+					if (indexStick>=sticks.size()) {
+						indexStick=0;
+					}
+					
+					indexGem++;
+					if (indexGem>=head.size()) {
+						indexGem=0;
+					}
+				}
+				
+				ItemRenderer itemRenderer=Minecraft.getInstance().getItemRenderer();
+				
+				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexGem)),18*1,18*0,itemRenderer);
+				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexIngot)),18*2,18*0,itemRenderer);
+				UserInterfaceUtils.renderRecipeItem(new ItemStack(sticks.get(indexStick)),18*1,18*1,itemRenderer);
+				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexGem)),18*2,18*1,itemRenderer);
+				UserInterfaceUtils.renderRecipeItem(new ItemStack(leather.get(indexLeather)),18*0,18*2,itemRenderer);
+				
+				ArrayList<ItemStack> stacks=new ArrayList<>();
+				stacks.add(null);
+				stacks.add(new ItemStack(head.get(indexGem)));
+				stacks.add(new ItemStack(head.get(indexIngot)));
+				stacks.add(null);
+				stacks.add(new ItemStack(sticks.get(indexStick)));
+				stacks.add(null);
+				stacks.add(new ItemStack(leather.get(indexLeather)));
+				UserInterfaceUtils.renderRecipeItem(this.getOutput(stacks),18*4+10,18,itemRenderer);
 			}
 		});
 	}

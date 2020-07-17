@@ -1,4 +1,4 @@
-package com.thelastflames.skyisles.Containers;
+package com.thelastflames.skyisles.containers;
 
 import com.thelastflames.skyisles.API.utils.ForgeRecipeRegistry;
 import net.minecraft.inventory.IInventory;

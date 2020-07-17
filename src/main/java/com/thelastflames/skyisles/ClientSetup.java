@@ -1,8 +1,8 @@
 package com.thelastflames.skyisles;
 
-import com.thelastflames.skyisles.Containers.ForgeContainer;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
 import com.thelastflames.skyisles.client.gui.ForgeScreen;
+import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
 import net.minecraft.client.gui.ScreenManager;

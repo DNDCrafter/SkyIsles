@@ -191,13 +191,33 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 	@Nonnull
 	@Override
 	protected ITextComponent getDefaultName() {
-		return new StringTextComponent("Drawer");
+		return new StringTextComponent("Drawer "+((part==2)?"Bottom":"Top"));
 	}
 	
 	@Nonnull
 	@Override
 	protected Container createMenu(int id, @Nonnull PlayerInventory player) {
-		return new ChestContainer(ContainerType.GENERIC_9X1,id,player,new Inventory((part==2)?listWrapperBottom:listWrapperTop),listWrapperTop.size()/9);
+		return new ChestContainer(ContainerType.GENERIC_3X3,id,player,new Inventory((part==2)?listWrapperBottom:listWrapperTop),listWrapperTop.size()/9);
+	}
+	
+	@Override
+	public BlockState mgetBlockState() {
+		return this.getBlockState();
+	}
+	
+	@Override
+	public BlockState getBlockState() {
+		return this.getWorld().getBlockState(this.getPos());
+	}
+	
+	@Override
+	public BlockPos mgetPos() {
+		return this.getPos();
+	}
+	
+	@Override
+	public World mgetWorld() {
+		return this.getWorld();
 	}
 	
 	@Override

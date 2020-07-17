@@ -1,4 +1,4 @@
-package com.thelastflames.skyisles.Containers;
+package com.thelastflames.skyisles.containers;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;

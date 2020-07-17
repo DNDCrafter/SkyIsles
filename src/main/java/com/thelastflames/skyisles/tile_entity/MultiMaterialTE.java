@@ -10,6 +10,7 @@ import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -53,8 +54,23 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 	}
 	
 	@Override
+	public BlockState mgetBlockState() {
+		return this.getBlockState();
+	}
+	
+	@Override
 	public BlockState getBlockState() {
 		return this.getWorld().getBlockState(this.getPos());
+	}
+	
+	@Override
+	public BlockPos mgetPos() {
+		return this.getPos();
+	}
+	
+	@Override
+	public World mgetWorld() {
+		return this.getWorld();
 	}
 	
 	@Nonnull
