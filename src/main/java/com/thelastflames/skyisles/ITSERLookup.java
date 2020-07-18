@@ -1,9 +1,9 @@
 package com.thelastflames.skyisles;
 
-import com.thelastflames.skyisles.client.Item.PickaxeISTER;
 import com.thelastflames.skyisles.client.block.IISter;
 import com.thelastflames.skyisles.client.block.ISter;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
+import com.thelastflames.skyisles.client.item.PickaxeISTER;
 import com.thelastflames.skyisles.items.DefaultNBTBlockItem;
 import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.tile_entity.MultiMaterialTE;

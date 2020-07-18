@@ -52,7 +52,7 @@ public class TextureHelper {
 		} else if (stack.getItem().equals(Items.PRISMARINE_CRYSTALS)) {
 			newStack=new ItemStack(Blocks.SEA_LANTERN);
 		} else if (ForgeRegistries.ITEMS.containsKey(new ResourceLocation(stack.getItem().getRegistryName().toString().replace("ingot","block")))) {
-			new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(stack.getItem().getRegistryName().toString().replace("ingot","block"))));
+			newStack=new ItemStack(ForgeRegistries.ITEMS.getValue(new ResourceLocation(stack.getItem().getRegistryName().toString().replace("ingot","block"))));
 		} else if (useEvent) {
 			FindBlockEvent event=new FindBlockEvent(stack.getItem(),newStack.getItem());
 			SkyIsles.postEvent(event);

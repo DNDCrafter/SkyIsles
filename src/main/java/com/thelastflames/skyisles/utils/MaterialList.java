@@ -25,7 +25,6 @@ public class MaterialList {
 		MaterialList list=new MaterialList();
 		for (String s1:s.split(";")) {
 			try {
-//				System.out.println(s1);
 				if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(s1))!=Items.AIR) {
 					list.add(ForgeRegistries.ITEMS.getValue(new ResourceLocation(s1)));
 				} else {
@@ -34,7 +33,6 @@ public class MaterialList {
 			} catch (Exception err) {
 				list.add(s1);
 			}
-//			System.out.println(list.names.get(list.names.size()-1));
 		}
 		return list;
 	}

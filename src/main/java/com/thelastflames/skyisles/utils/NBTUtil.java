@@ -6,9 +6,9 @@ import net.minecraft.nbt.INBT;
 import java.util.UUID;
 
 public class NBTUtil {
-	public static CompoundNBT createNBT(NBTObjectHolder... objects) {
+	public static CompoundNBT createNBT(NBTObjectHolder<?>... objects) {
 		CompoundNBT nbt=new CompoundNBT();
-		for (NBTObjectHolder object:objects) {
+		for (NBTObjectHolder<?> object:objects) {
 			if (object.getObject() instanceof String) {
 				nbt.putString(object.key,(String) object.object);
 			} else if (object.getObject() instanceof INBT) {

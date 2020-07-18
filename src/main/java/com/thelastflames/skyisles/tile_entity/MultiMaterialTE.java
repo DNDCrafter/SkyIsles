@@ -32,7 +32,7 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 	}
 	
 	@Override
-	public void read(CompoundNBT compound) {
+	public void read(@Nonnull CompoundNBT compound) {
 		super.read(compound);
 		if (!compound.contains("x")) {
 			try {
@@ -58,6 +58,7 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 		return this.getBlockState();
 	}
 	
+	@Nonnull
 	@Override
 	public BlockState getBlockState() {
 		return this.getWorld().getBlockState(this.getPos());
@@ -75,7 +76,7 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 	
 	@Nonnull
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundNBT write(@Nonnull CompoundNBT compound) {
 		super.write(compound);
 		compound.putString("materials",materialList.toString());
 		return compound;

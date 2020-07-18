@@ -16,13 +16,14 @@ public class NonNullListWrapper<T> extends NonNullList<T> {
 		return thisList.get(p_get_1_);
 	}
 	
+	@Nonnull
 	@Override
-	public T set(int p_set_1_, T p_set_2_) {
+	public T set(int p_set_1_, @Nonnull T p_set_2_) {
 		return thisList.set(p_set_1_,p_set_2_);
 	}
 	
 	@Override
-	public void add(int p_add_1_, T p_add_2_) {
+	public void add(int p_add_1_, @Nonnull T p_add_2_) {
 		thisList.add(p_add_1_,p_add_2_);
 	}
 	

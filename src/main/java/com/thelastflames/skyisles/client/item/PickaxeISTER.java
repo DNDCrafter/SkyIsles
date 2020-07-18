@@ -1,4 +1,4 @@
-package com.thelastflames.skyisles.client.Item;
+package com.thelastflames.skyisles.client.item;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.thelastflames.skyisles.utils.MaterialList;

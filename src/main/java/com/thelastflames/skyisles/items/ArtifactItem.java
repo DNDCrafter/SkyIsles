@@ -9,6 +9,7 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
+import javax.annotation.Nonnull;
 import java.util.function.Consumer;
 
 public class ArtifactItem extends Item {
@@ -22,20 +23,16 @@ public class ArtifactItem extends Item {
 		this.function=function;
 	}
 	
+	@Nonnull
 	@Override
-	public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-		Hand other;
-		if (handIn.equals(Hand.MAIN_HAND)) {
-			other=Hand.OFF_HAND;
-		} else {
-			other=Hand.MAIN_HAND;
-		}
-		if (playerIn.getHeldItem(other).getItem().equals(fuel)) {
+	public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn) {
+		int fuelSlot=playerIn.inventory.getSlotFor(new ItemStack(fuel));
+		if (fuelSlot>=0&&playerIn.inventory.getStackInSlot(fuelSlot).getItem().equals(fuel)) {
 			playerIn.getCooldownTracker().setCooldown(this, 20);
 			function.accept(playerIn);
 			playerIn.addStat(Stats.ITEM_USED.get(this));
 			if (!playerIn.abilities.isCreativeMode) {
-				playerIn.getHeldItem(other).shrink(1);
+				playerIn.inventory.getStackInSlot(fuelSlot).shrink(1);
 			}
 			return ActionResult.resultSuccess(playerIn.getHeldItem(handIn));
 		}

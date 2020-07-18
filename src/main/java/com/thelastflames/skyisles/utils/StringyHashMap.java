@@ -21,6 +21,7 @@ public class StringyHashMap<T,H> {
 		}
 		return check1;
 	}
+	
 	public H get(T key) {
 		int i=0;
 		for (T key1:keys) {
@@ -31,6 +32,7 @@ public class StringyHashMap<T,H> {
 		}
 		return null;
 	}
+	
 	public void remove(T key) {
 		int i=0;
 		try {
@@ -42,8 +44,9 @@ public class StringyHashMap<T,H> {
 				}
 				i++;
 			}
-		} catch (Exception err) {}
+		} catch (Exception ignored) {}
 	}
+	
 	public void add(T key,H object) {
 		keys.add(key);
 		objects.add(object);

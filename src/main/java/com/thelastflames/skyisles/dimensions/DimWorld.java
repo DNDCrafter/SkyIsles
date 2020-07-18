@@ -2,23 +2,26 @@ package com.thelastflames.skyisles.dimensions;
 
 import com.google.common.collect.ImmutableSet;
 import com.thelastflames.skyisles.biomes.BiomeBase;
-import com.thelastflames.skyisles.chunk_generators.TestGenerator;
+import com.thelastflames.skyisles.chunk_generators.SecondTestGenerator;
+import com.thelastflames.skyisles.registry.SkyBiomes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.EndGenerationSettings;
+import net.minecraft.world.gen.SimplexNoiseGenerator;
 import net.minecraftforge.client.IRenderHandler;
 
 import javax.annotation.Nonnull;
@@ -33,21 +36,50 @@ public class DimWorld extends Dimension {
 		super(worldIn, typeIn, 0);
 	}
 	
-	private final Set<Biome> biomes= ImmutableSet.of(
-			Biomes.THE_VOID
+	private final Set<Biome> midLandsBiomes=ImmutableSet.of(
+			SkyBiomes.PLAINS.get(),
+			SkyBiomes.FOGGY_PLAINS.get()
+	);
+	private final Set<Biome> highLandsBiomes=ImmutableSet.of(
+			SkyBiomes.MOUNTAINS.get(),
+			SkyBiomes.MOUNTAINS_ROCKY.get()
+	);
+	private final Set<Biome> lowLandsBiomes=ImmutableSet.of(
+			SkyBiomes.PLAINS.get()
 	);
 	
-	private ChunkGenerator generator=null;
+	private ChunkGenerator<?> generator=null;
 	
 	@Nonnull
 	@Override
 	public ChunkGenerator<?> createChunkGenerator() {
 		if (generator==null) {
-			generator=new TestGenerator(this.world, new BiomeProvider(biomes) {
+			generator=new SecondTestGenerator(this.world, new BiomeProvider(midLandsBiomes) {
 				@Nonnull
 				@Override
 				public Biome getNoiseBiome(int x, int y, int z) {
-					return (Biome)biomes.toArray()[0];
+					SimplexNoiseGenerator generator2=new SimplexNoiseGenerator(new SharedSeedRandom(world.getSeed()));
+					SimplexNoiseGenerator generator1=new SimplexNoiseGenerator(new SharedSeedRandom(world.getSeed()*2));
+					double value=generator2.getValue(x/1280f,z/1280f)*generator1.getValue(x/1280f,z/1280f);
+					
+					int height=((SecondTestGenerator)generator).getGenerationHeight(x,z);
+					int depth=((SecondTestGenerator)generator).getGenerationDepth(x,z);
+					if (height>=depth) {
+						return SkyBiomes.VOID.get();
+//					} else if (height>=100) {
+//						int number=(int)(value*highLandsBiomes.size());
+//						number=Math.max(0,Math.min(highLandsBiomes.size(),Math.abs(number)));
+//						return (Biome)(highLandsBiomes.toArray()[number]);
+//					} else if (height<=64) {
+//						int number=(int)(value*lowLandsBiomes.size());
+//						number=Math.max(0,Math.min(lowLandsBiomes.size(),Math.abs(number)));
+//						return (Biome)(lowLandsBiomes.toArray()[number]);
+					} else {
+						int number=(int)(value*midLandsBiomes.size());
+						number=Math.max(0,Math.min(midLandsBiomes.size(),Math.abs(number)));
+						return (Biome)(midLandsBiomes.toArray()[number]);
+					}
+//					return SkyBiomes.PLAINS.get();
 				}
 			}, new EndGenerationSettings());
 		}
@@ -62,7 +94,8 @@ public class DimWorld extends Dimension {
 	
 	@Override
 	public void getLightmapColors(float partialTicks, float sunBrightness, float skyLight, float blockLight, Vector3f colors) {
-//		colors=new Vector3f(sunBrightness,skyLight,blockLight);
+		float value=Math.max(colors.getX(),skyLight*sunBrightness*0.25f);
+		colors.set(value,value,value);
 	}
 	
 	@Override
@@ -72,7 +105,7 @@ public class DimWorld extends Dimension {
 	
 	@Override
 	public double getVoidFogYFactor() {
-		return 20;
+		return 0;
 	}
 	
 	@Nonnull
@@ -108,6 +141,15 @@ public class DimWorld extends Dimension {
 	@Nonnull
 	@Override
 	public Vec3d getFogColor(float celestialAngle, float partialTicks) {
+		int x=Minecraft.getInstance().player.getPosition().getX();
+		int y=Minecraft.getInstance().player.getPosition().getY();
+		int z=Minecraft.getInstance().player.getPosition().getZ();
+		if (this.getWorld().getBiome(new BlockPos(x,y,z)) instanceof BiomeBase) {
+			Vec3d color=((BiomeBase)this.getWorld().getBiome(new BlockPos(x,y,z))).getFogColor();
+			if (color!=null) {
+				return color;
+			}
+		}
 		float f = MathHelper.cos(celestialAngle * ((float)Math.PI * 2F)) * 2.0F + 0.5F;
 		f = MathHelper.clamp(f, 0.0F, 1.0F);
 		float f1 = 0.7529412F;
@@ -124,13 +166,26 @@ public class DimWorld extends Dimension {
 		return false;
 	}
 	
+	//Apparently this is passed x,y isntead of x,z for some stupid reason.
 	@Override
 	public boolean doesXZShowFog(int x, int z) {
 		try {
-			return ((BiomeBase)this.createChunkGenerator().getBiomeProvider().getNoiseBiome(x,0,z)).showsFog(x,z);
+			z=Minecraft.getInstance().player.getPosition().getZ();
+			Biome b=Minecraft.getInstance().player.world.getBiome(new BlockPos(x,0,z));
+////			Biome b=this.getWorld().getWorld().getBiome(new BlockPos(x,0,z));
+////			BiomeProvider provider=this.createChunkGenerator().getBiomeProvider();
+////			return ((BiomeBase)provider.getNoiseBiome(x,0,z)).showsFog(x,z);
+//			System.out.println(b);
+			return ((BiomeBase)b).showsFog(x,z);
+//			return false;
 		} catch (Exception err) {
 			return false;
 		}
+	}
+	
+	@Override
+	public float getCloudHeight() {
+		return -super.getCloudHeight()/4;
 	}
 	
 	@Nullable

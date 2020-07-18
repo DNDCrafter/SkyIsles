@@ -18,14 +18,14 @@ public class LampTE extends MultiMaterialTE {
 	}
 	
 	@Override
-	public void read(CompoundNBT compound) {
+	public void read(@Nonnull CompoundNBT compound) {
 		super.read(compound);
 		this.light=compound.getString("light");
 	}
 	
 	@Nonnull
 	@Override
-	public CompoundNBT write(CompoundNBT compound) {
+	public CompoundNBT write(@Nonnull CompoundNBT compound) {
 		super.write(compound);
 		compound.putString("light",this.light);
 		return compound;

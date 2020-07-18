@@ -8,10 +8,5 @@ import net.minecraftforge.fml.common.Mod;
 public class DimensionEvents {
 	@SubscribeEvent
 	public static void BreakSpeedEvent(PlayerEvent.BreakSpeed event) {
-//		boolean test=false;
-//		boolean test2=true;
-//		System.out.println(test?"hello":test2?"world":"!");
-//		System.out.println(SkyDimensions.TESTDIM.get());
-//		event.setNewSpeed(0);
 	}
 }

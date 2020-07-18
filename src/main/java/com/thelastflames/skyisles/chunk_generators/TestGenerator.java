@@ -1,5 +1,7 @@
 package com.thelastflames.skyisles.chunk_generators;
 
+import com.thelastflames.skyisles.biomes.BiomeBase;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
@@ -9,7 +11,7 @@ import net.minecraft.world.gen.*;
 
 import javax.annotation.Nonnull;
 
-public class TestGenerator extends ChunkGenerator {
+public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 	public TestGenerator(IWorld worldIn, BiomeProvider biomeProviderIn, GenerationSettings generationSettingsIn) {
 		super(worldIn, biomeProviderIn, generationSettingsIn);
 	}
@@ -191,20 +193,28 @@ public class TestGenerator extends ChunkGenerator {
 //				}
 //				ints.remove(gi);
 				
+				BlockState topBlock=Blocks.GRASS_BLOCK.getDefaultState();
+				BlockState middleBlock=Blocks.STONE.getDefaultState();
+				BlockState bottomBlock=Blocks.WHITE_STAINED_GLASS.getDefaultState();
+				try {
+					topBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getTopBlock();
+					middleBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getMiddleBlock();
+					bottomBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getBottomBlock();
+				} catch (Exception ignored) {}
 				int ystart=generator.func_222529_a(x+chunkIn.getPos().getXStart(),z+chunkIn.getPos().getZStart(), Heightmap.Type.WORLD_SURFACE);
 				boolean noblock=true;
 				for (int i=ystart;i>=0;i--) {
 					BlockPos pos=new BlockPos(x+chunkIn.getPos().getXStart(),i,z+chunkIn.getPos().getZStart());
 					if (worldIn.getBlockState(pos).isAir(world,pos)) {
 						if (!noblock) {
-							if (worldIn.getBlockState(pos.up()).equals(Blocks.STONE.getDefaultState())) {
-								worldIn.setBlockState(pos.up(),Blocks.WHITE_STAINED_GLASS.getDefaultState(),0);
+							if (worldIn.getBlockState(pos.up()).equals(middleBlock)) {
+								worldIn.setBlockState(pos.up(),bottomBlock,0);
 							}
 						}
 						noblock=true;
 					} else {
 						if (noblock) {
-							worldIn.setBlockState(pos,Blocks.GRASS_BLOCK.getDefaultState(),0);
+							worldIn.setBlockState(pos,topBlock,0);
 						}
 						noblock=false;
 					}

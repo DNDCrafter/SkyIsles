@@ -3,11 +3,9 @@ package com.thelastflames.skyisles;
 import com.thelastflames.skyisles.API.events.recipe.ForgeRecipesEvent;
 import com.thelastflames.skyisles.API.utils.ToolForgeRecipe;
 import com.thelastflames.skyisles.containers.ForgeContainer;
-import com.thelastflames.skyisles.registry.SkyBlocks;
-import com.thelastflames.skyisles.registry.SkyDimensions;
-import com.thelastflames.skyisles.registry.SkyItems;
-import com.thelastflames.skyisles.registry.SkyTileEntities;
+import com.thelastflames.skyisles.registry.*;
 import com.thelastflames.skyisles.utils.MaterialList;
+import com.thelastflames.skyisles.utils.StatsHelper;
 import com.thelastflames.skyisles.utils.client.UserInterfaceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -71,6 +69,7 @@ public class SkyIsles {
 		SkyItems.ITEMS.register(bus);
 		SkyDimensions.MOD_DIMENSIONS.register(bus);
 		SkyTileEntities.TILE_ENTITIES.register(bus);
+		SkyBiomes.BIOMES.register(bus);
 		
 		MinecraftForge.EVENT_BUS.register(this);
 	}
@@ -85,6 +84,7 @@ public class SkyIsles {
 		ForgeRecipesEvent eventRecipes = new ForgeRecipesEvent();
 		postEvent(eventRecipes);
 		eventRecipes.finish();
+		new StatsHelper().setup();
 	}
 	
 	public void clientSetupEvent(FMLClientSetupEvent event) {
@@ -148,7 +148,8 @@ public class SkyIsles {
 			@Override
 			public void renderRecipe() {
 				renderCalls++;
-				
+
+				//Collect usable materials
 				ArrayList<Item> leather=new ArrayList<>();
 				ArrayList<Item> sticks=new ArrayList<>();
 				ArrayList<Item> head=new ArrayList<>();
@@ -191,6 +192,7 @@ public class SkyIsles {
 				sticks.add(Items.BAMBOO);
 				leather.add(Items.RABBIT_HIDE);
 				
+				//Cycle through materials
 				if (renderCalls>=30) {
 					renderCalls=0;
 					indexIngot++;
@@ -214,14 +216,16 @@ public class SkyIsles {
 					}
 				}
 				
+				//Render input
 				ItemRenderer itemRenderer=Minecraft.getInstance().getItemRenderer();
 				
-				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexGem)),18*1,18*0,itemRenderer);
-				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexIngot)),18*2,18*0,itemRenderer);
-				UserInterfaceUtils.renderRecipeItem(new ItemStack(sticks.get(indexStick)),18*1,18*1,itemRenderer);
-				UserInterfaceUtils.renderRecipeItem(new ItemStack(head.get(indexGem)),18*2,18*1,itemRenderer);
-				UserInterfaceUtils.renderRecipeItem(new ItemStack(leather.get(indexLeather)),18*0,18*2,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)),18*1,18*0,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexIngot)),18*2,18*0,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(sticks.get(indexStick)),18*1,18*1,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)),18*2,18*1,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(leather.get(indexLeather)),18*0,18*2,itemRenderer);
 				
+				//Render output
 				ArrayList<ItemStack> stacks=new ArrayList<>();
 				stacks.add(null);
 				stacks.add(new ItemStack(head.get(indexGem)));

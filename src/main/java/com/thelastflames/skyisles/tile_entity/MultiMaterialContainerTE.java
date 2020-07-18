@@ -29,6 +29,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.thelastflames.skyisles.blocks.DrawerBlock.*;
@@ -124,6 +125,7 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 	
 	public void onRemove() {
 		part=1;
+		assert world != null;
 		InventoryHelper.dropInventoryItems(world, pos, new Inventory(listWrapperTop));
 		part=2;
 		InventoryHelper.dropInventoryItems(world, pos, new Inventory(listWrapperBottom));
@@ -205,9 +207,10 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 		return this.getBlockState();
 	}
 	
+	@Nonnull
 	@Override
 	public BlockState getBlockState() {
-		return this.getWorld().getBlockState(this.getPos());
+		return Objects.requireNonNull(this.getWorld()).getBlockState(this.getPos());
 	}
 	
 	@Override
