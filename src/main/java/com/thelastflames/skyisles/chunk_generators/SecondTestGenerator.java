@@ -21,6 +21,8 @@ import java.util.ArrayList;
 public class SecondTestGenerator extends ChunkGenerator<GenerationSettings> {
 	public SecondTestGenerator(IWorld worldIn, BiomeProvider biomeProviderIn, GenerationSettings generationSettingsIn) {
 		super(worldIn, biomeProviderIn, generationSettingsIn);
+		generatorBottom=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2),3,16);
+		generatorTop=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()),3,32);
 	}
 	
 	@Override
@@ -76,16 +78,16 @@ public class SecondTestGenerator extends ChunkGenerator<GenerationSettings> {
 		}
 	}
 	
+	private final PerlinNoiseGenerator generatorTop;
+	
 	public int getGenerationHeight(int x,int z) {
-		IWorld worldIn=this.world;
-		PerlinNoiseGenerator generatorTop=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()),3,32);
 		double top = generatorTop.noiseAt(x/128f, z/128f, true);
 		return (int) (top * 128)+getGroundHeight();
 	}
 	
+	private final PerlinNoiseGenerator generatorBottom;
+	
 	public int getGenerationDepth(int x,int z) {
-		IWorld worldIn=this.world;
-		PerlinNoiseGenerator generatorBottom=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2),3,16);
 		double bottom = generatorBottom.noiseAt(x/128f, z/128f, true);
 		return (int) (bottom * 128)+getGroundHeight();
 	}

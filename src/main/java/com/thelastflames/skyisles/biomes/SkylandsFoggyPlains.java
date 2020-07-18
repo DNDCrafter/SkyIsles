@@ -1,5 +1,6 @@
 package com.thelastflames.skyisles.biomes;
 
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
 import tfc.dynamic_rendering.Color;
@@ -16,12 +17,16 @@ public class SkylandsFoggyPlains extends BiomeBase {
 	
 	@Override
 	public int getGrassColor(double posX, double posZ) {
-		Color grassColor=new Color(super.getGrassColor(posX,posZ));
-		return new Color(grassColor.getRed()/2,grassColor.getGreen()/2,grassColor.getBlue()/2).getRGB();
+		return new Color(32,64,32).getRGB();
 	}
 	
 	@Override
 	public int getFoliageColor() {
 		return this.getGrassColor(0,0);
+	}
+	
+	@Override
+	public Vec3d getFogColor() {
+		return new Vec3d(1,1,1);
 	}
 }

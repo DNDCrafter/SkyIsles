@@ -21,7 +21,7 @@ import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.EndGenerationSettings;
-import net.minecraft.world.gen.SimplexNoiseGenerator;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
 import net.minecraftforge.client.IRenderHandler;
 
 import javax.annotation.Nonnull;
@@ -55,17 +55,18 @@ public class DimWorld extends Dimension {
 	public ChunkGenerator<?> createChunkGenerator() {
 		if (generator==null) {
 			generator=new SecondTestGenerator(this.world, new BiomeProvider(midLandsBiomes) {
+				private final PerlinNoiseGenerator generator2=new PerlinNoiseGenerator(new SharedSeedRandom(world.getSeed()),1,4);
+				private final PerlinNoiseGenerator generator1=new PerlinNoiseGenerator(new SharedSeedRandom(world.getSeed()*2),2,3);
+				
 				@Nonnull
 				@Override
 				public Biome getNoiseBiome(int x, int y, int z) {
-					SimplexNoiseGenerator generator2=new SimplexNoiseGenerator(new SharedSeedRandom(world.getSeed()));
-					SimplexNoiseGenerator generator1=new SimplexNoiseGenerator(new SharedSeedRandom(world.getSeed()*2));
-					double value=generator2.getValue(x/1280f,z/1280f)*generator1.getValue(x/1280f,z/1280f);
+					double value=generator2.noiseAt(x/32f,z/32f,true)+generator1.noiseAt(x/32f,z/32f,true);
 					
-					int height=((SecondTestGenerator)generator).getGenerationHeight(x,z);
-					int depth=((SecondTestGenerator)generator).getGenerationDepth(x,z);
-					if (height>=depth) {
-						return SkyBiomes.VOID.get();
+//					int height=((SecondTestGenerator)generator).getGenerationHeight(x,z);
+//					int depth=((SecondTestGenerator)generator).getGenerationDepth(x,z);
+//					if (height>depth) {
+//						return SkyBiomes.VOID.get();
 //					} else if (height>=100) {
 //						int number=(int)(value*highLandsBiomes.size());
 //						number=Math.max(0,Math.min(highLandsBiomes.size(),Math.abs(number)));
@@ -74,11 +75,11 @@ public class DimWorld extends Dimension {
 //						int number=(int)(value*lowLandsBiomes.size());
 //						number=Math.max(0,Math.min(lowLandsBiomes.size(),Math.abs(number)));
 //						return (Biome)(lowLandsBiomes.toArray()[number]);
-					} else {
+//					} else {
 						int number=(int)(value*midLandsBiomes.size());
-						number=Math.max(0,Math.min(midLandsBiomes.size(),Math.abs(number)));
+						number=Math.max(0,Math.min(midLandsBiomes.size()-1,Math.abs(number)));
 						return (Biome)(midLandsBiomes.toArray()[number]);
-					}
+//					}
 //					return SkyBiomes.PLAINS.get();
 				}
 			}, new EndGenerationSettings());
@@ -185,7 +186,7 @@ public class DimWorld extends Dimension {
 	
 	@Override
 	public float getCloudHeight() {
-		return -super.getCloudHeight()/4;
+		return -23;
 	}
 	
 	@Nullable

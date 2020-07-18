@@ -49,6 +49,6 @@ public class SimpleTree extends Structure {
 	@Override
 	public void spawn(int x, int y, int z, IChunk chunk) {
 		chunk.setBlockState(new BlockPos(x,y,z), SkyBlocks.TREE_SPAWNER_BLOCK.getObject1().get().getDefaultState(), false);
-		chunk.getBlocksToBeTicked().scheduleTick(chunk.getPos().asBlockPos().add(new BlockPos(x,y,z)), SkyBlocks.TREE_SPAWNER_BLOCK.getObject1().get(),1);
+		chunk.getBlocksToBeTicked().scheduleTick(chunk.getPos().asBlockPos().add(new BlockPos(x,y,z)), SkyBlocks.TREE_SPAWNER_BLOCK.getObject1().get(),32);
 	}
 }
