@@ -6,6 +6,7 @@ import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.*;
 import com.thelastflames.skyisles.utils.MaterialList;
 import com.thelastflames.skyisles.utils.StatsHelper;
+import com.thelastflames.skyisles.utils.client.BetterFPSGraphWrapper;
 import com.thelastflames.skyisles.utils.client.UserInterfaceUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemRenderer;
@@ -277,5 +278,17 @@ public class SkyIsles {
 	
 	private static <T extends Container> ContainerType<T> register(String key, ContainerType.IFactory<T> factory) {
 		return Registry.register(Registry.MENU, key, new ContainerType<>(factory));
+	}
+	
+	public static void createBFPSGraphSection(String name, double r, double g, double b) {
+		BetterFPSGraphWrapper.createSection(name,r,g,b);
+	}
+	
+	public static void createBFPSGraphSection(String name, int r, int g, int b) {
+		BetterFPSGraphWrapper.createSection(name,r/255d,g/255d,b/255d);
+	}
+	
+	public static void endBFPSGraphSection() {
+		BetterFPSGraphWrapper.endSection();
 	}
 }
