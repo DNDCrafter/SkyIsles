@@ -4,6 +4,7 @@ import com.thelastflames.skyisles.SkyIsles;
 import com.thelastflames.skyisles.tile_entity.LampTE;
 import com.thelastflames.skyisles.tile_entity.MultiMaterialContainerTE;
 import com.thelastflames.skyisles.tile_entity.MultiMaterialTE;
+import com.thelastflames.skyisles.tile_entity.SkyboxTileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
@@ -19,6 +20,11 @@ public class SkyTileEntities {
 			SkyBlocks.LAMP_BLOCK.getObject1().get()
 	).build(null));
 	public static final RegistryObject<TileEntityType<MultiMaterialContainerTE>> DRAWER_TE = TILE_ENTITIES.register("drawer_te", () -> TileEntityType.Builder.create(MultiMaterialContainerTE::new,
-			SkyBlocks.LAMP_BLOCK.getObject1().get()
+			SkyBlocks.DRAWER_BLOCK.getObject1().get()
+	).build(null));
+	
+	public static final RegistryObject<TileEntityType<SkyboxTileEntity>> SKYBOX = TILE_ENTITIES.register("skybox_tile_entity", () -> TileEntityType.Builder.create(SkyboxTileEntity::new,
+			SkyBlocks.SKYBOX_BLOCK.getObject1().get(),
+			SkyBlocks.SKYBOX_BLOCK_PURPLE.getObject1().get()
 	).build(null));
 }

@@ -3,6 +3,7 @@ package com.thelastflames.skyisles;
 import com.thelastflames.skyisles.client.block.IISter;
 import com.thelastflames.skyisles.client.block.ISter;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
+import com.thelastflames.skyisles.client.block.SkyboxIster;
 import com.thelastflames.skyisles.client.item.PickaxeISTER;
 import com.thelastflames.skyisles.items.DefaultNBTBlockItem;
 import com.thelastflames.skyisles.registry.SkyBlocks;
@@ -64,6 +65,9 @@ public class ITSERLookup {
 			map.put("pillar",new ISter(multimaterialteiisterpillar));
 			map.put("lamp_block",new ISter(multimaterialteiisterlamp));
 			map.put("tool_metal_pickaxe", new PickaxeISTER());
+			
+			map.put("skybox_test", new SkyboxIster(()->SkyBlocks.SKYBOX_BLOCK.getObject1().get()));
+			map.put("skybox_test_purple", new SkyboxIster(()->SkyBlocks.SKYBOX_BLOCK_PURPLE.getObject1().get()));
 		} catch (Exception ignored) {}
 	}
 	

@@ -1,6 +1,7 @@
 package com.thelastflames.skyisles;
 
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
+import com.thelastflames.skyisles.client.block.SkyboxRenderer;
 import com.thelastflames.skyisles.client.gui.ForgeScreen;
 import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.SkyBlocks;
@@ -27,6 +28,7 @@ public class ClientSetup {
 	public static void registerTERS() {
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.MULTIMATERIALTE.get(), MultiMaterialTERenderer::new);
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.LAMPTE.get(), MultiMaterialTERenderer::new);
+		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.SKYBOX.get(), SkyboxRenderer::new);
 	}
 	public static void setupRenderLayers() {
 		RenderTypeLookup.setRenderLayer(SkyBlocks.LAMP_BLOCK.getObject1().get(), RenderType.getCutout());

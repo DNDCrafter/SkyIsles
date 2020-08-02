@@ -21,7 +21,9 @@ import java.util.ArrayList;
 public class SecondTestGenerator extends ChunkGenerator<GenerationSettings> {
 	public SecondTestGenerator(IWorld worldIn, BiomeProvider biomeProviderIn, GenerationSettings generationSettingsIn) {
 		super(worldIn, biomeProviderIn, generationSettingsIn);
-		generatorBottom=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2),3,16);
+//		generatorBottomPerlin=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2),3,16);
+		generatorBottomPerlin=new SimplexNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2));
+		generatorBottom=new OctavesNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()*2),3,16);
 		generatorTop=new PerlinNoiseGenerator(new SharedSeedRandom(worldIn.getSeed()),3,32);
 	}
 	
@@ -81,14 +83,21 @@ public class SecondTestGenerator extends ChunkGenerator<GenerationSettings> {
 	private final PerlinNoiseGenerator generatorTop;
 	
 	public int getGenerationHeight(int x,int z) {
-		double top = generatorTop.noiseAt(x/128f, z/128f, true);
+		double top = generatorBottomPerlin.getValue(x/4280f, z/4280f);
+		top *= generatorTop.noiseAt(x/128f, z/128f, true);
+		top += generatorTop.noiseAt(x/256f, z/256f, true);
+//		double top = generatorTop.noiseAt(x/128f, z/128f, true);
 		return (int) (top * 128)+getGroundHeight();
 	}
 	
-	private final PerlinNoiseGenerator generatorBottom;
+	private final SimplexNoiseGenerator generatorBottomPerlin;
+	private final OctavesNoiseGenerator generatorBottom;
 	
 	public int getGenerationDepth(int x,int z) {
-		double bottom = generatorBottom.noiseAt(x/128f, z/128f, true);
+		double bottom = generatorBottomPerlin.getValue(x/4280f, z/4280f);
+		bottom *= generatorBottom.noiseAt(x/128f,z/128f, 0,256);
+		bottom += generatorBottom.noiseAt(x/256f,z/256f, 0,256);
+//		return (int) (bottom * 128)+getGroundHeight();
 		return (int) (bottom * 128)+getGroundHeight();
 	}
 	
