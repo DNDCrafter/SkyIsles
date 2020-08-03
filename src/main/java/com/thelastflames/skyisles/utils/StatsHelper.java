@@ -12,35 +12,35 @@ import net.minecraft.item.PickaxeItem;
 import java.util.HashMap;
 
 public class StatsHelper {
-	private static final HashMap<Item,ToolStats> statsHashMap = new HashMap<>();
+	private static final HashMap<Item, ToolStats> statsHashMap = new HashMap<>();
 	
 	public static ToolStats get(Item item) {
 		if (statsHashMap.containsKey(item)) {
 			return statsHashMap.get(item);
 		} else {
 			if (item instanceof PickaxeItem) {
-				double damage=0;
-				double damageBase=-998234032;
+				double damage = 0;
+				double damageBase = -998234032;
 				for (AttributeModifier attributeModifier : item.getAttributeModifiers(EquipmentSlotType.MAINHAND).get(SharedMonsterAttributes.ATTACK_DAMAGE.getName())) {
-					if (damageBase==-998234032) {
-						damageBase=attributeModifier.getAmount();
+					if (damageBase == -998234032) {
+						damageBase = attributeModifier.getAmount();
 					}
 					if (attributeModifier.getOperation().equals(AttributeModifier.Operation.ADDITION)) {
 						damage += attributeModifier.getAmount();
 					} else if (attributeModifier.getOperation().equals(AttributeModifier.Operation.MULTIPLY_TOTAL)) {
 						damage *= attributeModifier.getAmount();
 					} else if (attributeModifier.getOperation().equals(AttributeModifier.Operation.MULTIPLY_BASE)) {
-						damage += (damageBase*attributeModifier.getAmount())-damageBase;
+						damage += (damageBase * attributeModifier.getAmount()) - damageBase;
 					}
 				}
-				return new ToolStats(item.getMaxDamage(),damage,item.getDestroySpeed(new ItemStack(item), Blocks.STONE.getDefaultState()),item.getUseDuration(new ItemStack(item)));
+				return new ToolStats(item.getMaxDamage(), damage, item.getDestroySpeed(new ItemStack(item), Blocks.STONE.getDefaultState()), item.getUseDuration(new ItemStack(item)));
 			}
 		}
 		return null;
 	}
 	
 	public void setup() {
-		statsHashMap.put(Items.QUARTZ,new ToolStats(32,8,0,3));
+		statsHashMap.put(Items.QUARTZ, new ToolStats(32, 8, 0, 3));
 	}
 	
 	public static class ToolStats {

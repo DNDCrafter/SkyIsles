@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 public class ForgeRecipeRegistry {
-	protected static final StringyHashMap<ResourceLocation, ToolForgeRecipe> recipeHashMap=new StringyHashMap<>();
+	protected static final StringyHashMap<ResourceLocation, ToolForgeRecipe> recipeHashMap = new StringyHashMap<>();
 	
 	public static void registerRecipe(ResourceLocation location, ToolForgeRecipe recipe) {
-		recipeHashMap.add(location,recipe);
+		recipeHashMap.add(location, recipe);
 	}
 	
-	public static void forEach(BiConsumer<ResourceLocation,ToolForgeRecipe> consumer) {
+	public static void forEach(BiConsumer<ResourceLocation, ToolForgeRecipe> consumer) {
 		recipeHashMap.forEach(consumer);
 	}
 	

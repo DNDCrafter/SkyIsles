@@ -48,7 +48,7 @@ public class ForgeBlock extends Block {
 		@Nonnull
 		@Override
 		public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
-			return new ForgeContainer(ForgeContainer.TYPE,p_createMenu_1_,p_createMenu_2_,new Inventory(9),9,p_createMenu_3_);
+			return new ForgeContainer(ForgeContainer.TYPE, p_createMenu_1_, p_createMenu_2_, new Inventory(9), 9, p_createMenu_3_);
 		}
 	};
 }

@@ -33,6 +33,7 @@ import tfc.dynamic_rendering.API.TexturedModel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 public class LampBlock extends DynamicModelBlock {
 	public LampBlock() {
@@ -46,11 +47,11 @@ public class LampBlock extends DynamicModelBlock {
 	
 	@Override
 	public int getLightValue(BlockState state, IBlockReader world, BlockPos pos) {
-		TileEntity te=world.getTileEntity(pos);
-		if (te!=null&&te instanceof LampTE) {
-			Item light=Registry.ITEM.getOrDefault(new ResourceLocation(((LampTE) te).light));
-			Block block=Block.getBlockFromItem(light);
-			if (block.getLightValue(block.getDefaultState())>=1) {
+		TileEntity te = world.getTileEntity(pos);
+		if (te instanceof LampTE) {
+			Item light = Registry.ITEM.getOrDefault(new ResourceLocation(((LampTE) te).light));
+			Block block = Block.getBlockFromItem(light);
+			if (block.getLightValue(block.getDefaultState()) >= 1) {
 				return block.getLightValue(block.getDefaultState());
 			}
 		}
@@ -69,13 +70,13 @@ public class LampBlock extends DynamicModelBlock {
 		return new LampTE();
 	}
 	
-	static StringyHashMap<MaterialList,PreppedModel> modelHashMap=new StringyHashMap<>();
+	static StringyHashMap<MaterialList, PreppedModel> modelHashMap = new StringyHashMap<>();
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		NBTUtil.NBTObjectHolder obj=new NBTUtil.NBTObjectHolder("BlockEntityTag",player.world.getTileEntity(pos).write(new CompoundNBT()));
-		ItemStack stack=new ItemStack(SkyBlocks.LAMP_BLOCK.getObject2().get());
-		CompoundNBT nbt=obj.Package();
+		NBTUtil.NBTObjectHolder<?> obj = new NBTUtil.NBTObjectHolder<>("BlockEntityTag", Objects.requireNonNull(player.world.getTileEntity(pos)).write(new CompoundNBT()));
+		ItemStack stack = new ItemStack(SkyBlocks.LAMP_BLOCK.getObject2().get());
+		CompoundNBT nbt = obj.Package();
 		nbt.remove("x");
 		nbt.remove("y");
 		nbt.remove("z");
@@ -87,34 +88,33 @@ public class LampBlock extends DynamicModelBlock {
 	@Nonnull
 	@Override
 	public PreppedModel getModel(MaterialList listIn, BlockPos posIn, World worldIn) {
-		modelHashMap.objects.clear();
-		modelHashMap.keys.clear();
 		if (!modelHashMap.containsKey(listIn)) {
-			ExtrudedTexture texture1=new ExtrudedTexture(
+			ExtrudedTexture texture1 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/lamp_overlay"),
 					new ResourceLocation(listIn.names.get(1)),
-					1,false
+					1, false
 			);
-			ExtrudedTexture texture2=new ExtrudedTexture(
+			ExtrudedTexture texture2 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/lamp_base"),
 					new ResourceLocation(listIn.names.get(0)),
-					1,false
+					1, false
 			);
-			TexturedModel txmdl=
-					Renderer.createExtrudedTextureNoTexCorrection(true,texture1)
+			TexturedModel txmdl =
+					Renderer.createExtrudedTextureNoTexCorrection(true, texture1)
 							.merge(
 //									Renderer.createFlatTexturedModel(texture2.base,true),
-									Renderer.createFlatTexturedModel(texture2.mask,true)
-							).scale(1,1,0.01f).translate(0,0,0.005f);
-			TexturedModel txmdl2=txmdl.translate(0,0,0).merge(
-					txmdl.rotate((float) Math.toRadians(90),0).translate(0,0,16),
-					txmdl.rotate((float) Math.toRadians(180),0).translate(16,0,16),
-					txmdl.rotate((float) Math.toRadians(-90),0).translate(16,0,0),
-					txmdl.rotate(0,(float) Math.toRadians(-90)).translate(0,16,0),
-					txmdl.rotate(0,(float) Math.toRadians(90)).translate(0,0,16)
+									Renderer.createFlatTexturedModel(texture2.mask, true)
+							).scale(1, 1, 0.01f).translate(0, 0, 0.005f);
+			TexturedModel txmdl2 = txmdl.translate(0, 0, 0).merge(
+					txmdl.rotate((float) Math.toRadians(90), 0).translate(0, 0, 16),
+					txmdl.rotate((float) Math.toRadians(180), 0).translate(16, 0, 16),
+					txmdl.rotate((float) Math.toRadians(-90), 0).translate(16, 0, 0),
+					txmdl.rotate(0, (float) Math.toRadians(-90)).translate(0, 16, 0),
+					txmdl.rotate(0, (float) Math.toRadians(90)).translate(0, 0, 16)
 			);
-			PreppedModel mdl=Renderer.prepModel(txmdl2,false);
-			if (posIn.getY()!=-9999) modelHashMap.add(listIn,mdl); else return mdl;
+			PreppedModel mdl = Renderer.prepModel(txmdl2, false);
+			if (posIn.getY() != -9999) modelHashMap.add(listIn, mdl);
+			else return mdl;
 		}
 		return modelHashMap.get(listIn);
 	}
@@ -122,15 +122,16 @@ public class LampBlock extends DynamicModelBlock {
 	@Override
 	public boolean preRender(MatrixStack stack, BlockPos pos) {
 		stack.push();
-		if (pos.equals(new BlockPos(0,-9999,0))) {
-			stack.rotate(new Quaternion(90,0,0,true));
-			stack.translate(0,0,-1.f);
+		if (pos.equals(new BlockPos(0, -9999, 0))) {
+			stack.rotate(new Quaternion(90, 0, 0, true));
+			stack.translate(0, 0, -1.f);
 		}
 		return false;
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {}
+	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {
+	}
 	
 	@Override
 	public void postRender(MatrixStack stack, BlockPos pos) {

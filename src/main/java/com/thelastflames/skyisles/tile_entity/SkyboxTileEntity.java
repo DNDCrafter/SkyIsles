@@ -23,24 +23,24 @@ public class SkyboxTileEntity extends TileEntity {
 	}
 	
 	public ResourceLocation getSkyTexture(Block blockIn) {
-		return ((SkyboxBlock)blockIn).getBackground(this.world);
+		return ((SkyboxBlock) blockIn).getBackground(this.world);
 	}
 	
 	public ResourceLocation getPassTexture(Block blockIn) {
-		return ((SkyboxBlock)blockIn).getSky(this.world);
+		return ((SkyboxBlock) blockIn).getSky(this.world);
 	}
 	
 	public ResourceLocation getStarsPassTexture(Block blockIn) {
-		return ((SkyboxBlock)blockIn).getStars(this.world);
+		return ((SkyboxBlock) blockIn).getStars(this.world);
 	}
 	
 	@OnlyIn(Dist.CLIENT)
 	public boolean shouldRenderFace(Direction face, World world, BlockPos pos) {
-		if (world==null || pos==null) {
+		if (world == null || pos == null) {
 			return true;
 		}
-		BlockPos pos1=pos.offset(face);
-		BlockState state=world.getBlockState(pos1);
-		return (!state.isSolidSide(world,pos1,face.getOpposite()))||(!state.isOpaqueCube(world,pos1));
+		BlockPos pos1 = pos.offset(face);
+		BlockState state = world.getBlockState(pos1);
+		return (!state.isSolidSide(world, pos1, face.getOpposite())) || (!state.isOpaqueCube(world, pos1));
 	}
 }

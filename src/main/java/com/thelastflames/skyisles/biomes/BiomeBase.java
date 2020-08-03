@@ -11,13 +11,13 @@ import net.minecraft.world.biome.Biome;
 import java.util.ArrayList;
 
 public class BiomeBase extends Biome {
-	private static final SurfaceBuilder defaultSurfaceBuilder=new DefaultSurfaceBuilder();
+	private static final SurfaceBuilder defaultSurfaceBuilder = new DefaultSurfaceBuilder();
 	
 	public BiomeBase(Builder biomeBuilder) {
 		super(biomeBuilder);
 	}
 	
-	public boolean showsFog(int x,int z) {
+	public boolean showsFog(int x, int z) {
 		return true;
 	}
 	
@@ -41,7 +41,7 @@ public class BiomeBase extends Biome {
 		return Blocks.WHITE_STAINED_GLASS.getDefaultState();
 	}
 	
-	public ArrayList<Structure> getStructures(){
+	public ArrayList<Structure> getStructures() {
 		return new ArrayList<>();
 	}
 	

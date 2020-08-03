@@ -18,16 +18,16 @@ import java.util.ArrayList;
 public class SkyItems {
 	public static final DeferredRegister<Item> ITEMS = new DeferredRegister<>(ForgeRegistries.ITEMS, SkyIsles.ModID);
 	
-	public static final RegistryObject<Item> TEXTURE_LOADER=ITEMS.register("texture_loader",()->new Item(new Item.Properties()));
-	public static final RegistryObject<Item> SKYISLES_ICON =ITEMS.register("skyisles_icon",()->new Item(new Item.Properties()));
-	public static final RegistryObject<Item> METAL_PICKAXE=ITEMS.register("metal_tool",()->new PickaxeItem(ItemTier.DIAMOND,1,1, new Item.Properties().setISTER(()->()->new PickaxeISTER()).group(CreativeTabs.TOOLS)));
+	public static final RegistryObject<Item> TEXTURE_LOADER = ITEMS.register("texture_loader", () -> new Item(new Item.Properties()));
+	public static final RegistryObject<Item> SKYISLES_ICON = ITEMS.register("skyisles_icon", () -> new Item(new Item.Properties()));
+	public static final RegistryObject<Item> METAL_PICKAXE = ITEMS.register("metal_tool", () -> new PickaxeItem(ItemTier.DIAMOND, 1, 1, new Item.Properties().setISTER(() -> () -> new PickaxeISTER()).group(CreativeTabs.TOOLS)));
 	
 	public static final ArrayList<RegistryObject<Item>> ARTIFACTS = registerArtifacts();
 	
 	private static ArrayList<RegistryObject<Item>> registerArtifacts() {
-		ArrayList<RegistryObject<Item>> items=new ArrayList<>();
+		ArrayList<RegistryObject<Item>> items = new ArrayList<>();
 		
-		items.add(ITEMS.register("test_artifact",()->new ArtifactItem(Items.COAL, ArtifactMethods::useTest)));
+		items.add(ITEMS.register("test_artifact", () -> new ArtifactItem(Items.COAL, ArtifactMethods::useTest)));
 		return items;
 	}
 }

@@ -35,10 +35,10 @@ import java.util.Optional;
 import static com.thelastflames.skyisles.blocks.DrawerBlock.*;
 
 public class MultiMaterialContainerTE extends LockableLootTileEntity implements IMultiMaterialTE, INamedContainerProvider {
-	public MaterialList materialList=new MaterialList();
+	public MaterialList materialList = new MaterialList();
 	
-	NonNullListWrapper<ItemStack> listWrapperTop=new NonNullListWrapper<>(NonNullList.withSize(9,ItemStack.EMPTY));
-	NonNullListWrapper<ItemStack> listWrapperBottom=new NonNullListWrapper<>(NonNullList.withSize(9,ItemStack.EMPTY));
+	NonNullListWrapper<ItemStack> listWrapperTop = new NonNullListWrapper<>(NonNullList.withSize(9, ItemStack.EMPTY));
+	NonNullListWrapper<ItemStack> listWrapperBottom = new NonNullListWrapper<>(NonNullList.withSize(9, ItemStack.EMPTY));
 	
 	public MultiMaterialContainerTE(TileEntityType<?> typeIn) {
 		super(typeIn);
@@ -53,51 +53,53 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 		super.read(compound);
 		if (!compound.contains("x")) {
 			try {
-				this.pos=new BlockPos(0,-9999,0);
-			} catch (Exception ignored) {}
+				this.pos = new BlockPos(0, -9999, 0);
+			} catch (Exception ignored) {
+			}
 		}
-		ItemStackHelper.loadAllItems(compound.getCompound("items_top"),listWrapperTop);
-		ItemStackHelper.loadAllItems(compound.getCompound("items_bottom"),listWrapperBottom);
-		materialList=MaterialList.fromString(compound.getString("materials"));
+		ItemStackHelper.loadAllItems(compound.getCompound("items_top"), listWrapperTop);
+		ItemStackHelper.loadAllItems(compound.getCompound("items_bottom"), listWrapperBottom);
+		materialList = MaterialList.fromString(compound.getString("materials"));
 	}
 	
-	private int part=0;
+	private int part = 0;
+	
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		part=0;
-		double distance=999999;
-		if (player!=null) {
-			Vec3d start=player.getEyePosition(0);
-			Vec3d stop=start.add(player.getLookVec().scale(9));
-			for (AxisAlignedBB bb:raytraceShapeTop.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+		part = 0;
+		double distance = 999999;
+		if (player != null) {
+			Vec3d start = player.getEyePosition(0);
+			Vec3d stop = start.add(player.getLookVec().scale(9));
+			for (AxisAlignedBB bb : raytraceShapeTop.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=1;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = 1;
 					}
 				}
 			}
-			for (AxisAlignedBB bb:raytraceShapeBottom.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+			for (AxisAlignedBB bb : raytraceShapeBottom.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=2;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = 2;
 					}
 				}
 			}
-			for (AxisAlignedBB bb:raytraceShape.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+			for (AxisAlignedBB bb : raytraceShape.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=0;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = 0;
 					}
 				}
 			}
 		}
 		
-		if (!worldIn.isRemote&&part!=0) {
+		if (!worldIn.isRemote && part != 0) {
 			INamedContainerProvider inamedcontainerprovider = this;
 			player.openContainer(inamedcontainerprovider);
 			player.addStat(this.getOpenStat());
@@ -113,21 +115,21 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 	@Override
 	public CompoundNBT write(@Nonnull CompoundNBT compound) {
 		super.write(compound);
-		compound.putString("materials",materialList.toString());
-		CompoundNBT top=new CompoundNBT();
-		CompoundNBT bottom=new CompoundNBT();
-		ItemStackHelper.saveAllItems(top,listWrapperTop);
-		ItemStackHelper.saveAllItems(bottom,listWrapperBottom);
-		compound.put("items_top",top);
-		compound.put("items_bottom",bottom);
+		compound.putString("materials", materialList.toString());
+		CompoundNBT top = new CompoundNBT();
+		CompoundNBT bottom = new CompoundNBT();
+		ItemStackHelper.saveAllItems(top, listWrapperTop);
+		ItemStackHelper.saveAllItems(bottom, listWrapperBottom);
+		compound.put("items_top", top);
+		compound.put("items_bottom", bottom);
 		return compound;
 	}
 	
 	public void onRemove() {
-		part=1;
+		part = 1;
 		assert world != null;
 		InventoryHelper.dropInventoryItems(world, pos, new Inventory(listWrapperTop));
-		part=2;
+		part = 2;
 		InventoryHelper.dropInventoryItems(world, pos, new Inventory(listWrapperBottom));
 		world.updateComparatorOutputLevel(pos, this.getBlockState().getBlock());
 	}
@@ -193,13 +195,13 @@ public class MultiMaterialContainerTE extends LockableLootTileEntity implements 
 	@Nonnull
 	@Override
 	protected ITextComponent getDefaultName() {
-		return new StringTextComponent("Drawer "+((part==2)?"Bottom":"Top"));
+		return new StringTextComponent("Drawer " + ((part == 2) ? "Bottom" : "Top"));
 	}
 	
 	@Nonnull
 	@Override
 	protected Container createMenu(int id, @Nonnull PlayerInventory player) {
-		return new ChestContainer(ContainerType.GENERIC_3X3,id,player,new Inventory((part==2)?listWrapperBottom:listWrapperTop),listWrapperTop.size()/9);
+		return new ChestContainer(ContainerType.GENERIC_3X3, id, player, new Inventory((part == 2) ? listWrapperBottom : listWrapperTop), listWrapperTop.size() / 9);
 	}
 	
 	@Override

@@ -16,19 +16,20 @@ public class CraftingMatrix {
 	final Slot output;
 	
 	public CraftingMatrix(IInventory inventory, Slot outputSlot) {
-		output=outputSlot;
-		this.inventory=inventory;
+		output = outputSlot;
+		this.inventory = inventory;
 	}
 	
 	public void onChange() {
-		ArrayList<ItemStack> stacks=new ArrayList<>();
+		ArrayList<ItemStack> stacks = new ArrayList<>();
 		try {
-			for (int i=0;i<inventory.getSizeInventory();i++) {
+			for (int i = 0; i < inventory.getSizeInventory(); i++) {
 				stacks.add(inventory.getStackInSlot(i));
 			}
-		} catch (Throwable err) {}
+		} catch (Throwable err) {
+		}
 		output.putStack(ItemStack.EMPTY);
-		ForgeRecipeRegistry.forEach((l, r)->{
+		ForgeRecipeRegistry.forEach((l, r) -> {
 			if (r.checkMatch(stacks)) {
 				output.putStack(r.getOutput(stacks));
 			}
@@ -36,10 +37,10 @@ public class CraftingMatrix {
 	}
 	
 	public void onClose(World world, BlockPos pos) {
-		ArrayList<ItemStack> stacks=new ArrayList<>();
-		for (int i=0;i<=inventory.getSizeInventory();i++) {
+		ArrayList<ItemStack> stacks = new ArrayList<>();
+		for (int i = 0; i <= inventory.getSizeInventory(); i++) {
 			stacks.add(inventory.getStackInSlot(i));
 		}
-		stacks.forEach((s)->InventoryHelper.spawnItemStack(world,pos.getX(),pos.getY(),pos.getZ(),s.copy()));
+		stacks.forEach((s) -> InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), s.copy()));
 	}
 }

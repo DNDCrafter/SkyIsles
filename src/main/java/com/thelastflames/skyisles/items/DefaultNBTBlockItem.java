@@ -15,9 +15,10 @@ import javax.annotation.Nonnull;
 
 public class DefaultNBTBlockItem extends BlockItem {
 	private final CompoundNBT defaultNBT;
+	
 	public DefaultNBTBlockItem(Block blockIn, Properties builder, CompoundNBT nbt) {
 		super(blockIn, builder);
-		this.defaultNBT=nbt;
+		this.defaultNBT = nbt;
 	}
 	
 	public CompoundNBT getDefaultNBT() {

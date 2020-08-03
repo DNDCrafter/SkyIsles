@@ -19,15 +19,15 @@ public class ArtifactItem extends Item {
 	
 	public ArtifactItem(Item fuel, Consumer<PlayerEntity> function) {
 		super(new ArtifactProperties());
-		this.fuel=fuel;
-		this.function=function;
+		this.fuel = fuel;
+		this.function = function;
 	}
 	
 	@Nonnull
 	@Override
 	public ActionResult<ItemStack> onItemRightClick(@Nonnull World worldIn, @Nonnull PlayerEntity playerIn, @Nonnull Hand handIn) {
-		int fuelSlot=playerIn.inventory.getSlotFor(new ItemStack(fuel));
-		if (fuelSlot>=0&&playerIn.inventory.getStackInSlot(fuelSlot).getItem().equals(fuel)) {
+		int fuelSlot = playerIn.inventory.getSlotFor(new ItemStack(fuel));
+		if (fuelSlot >= 0 && playerIn.inventory.getStackInSlot(fuelSlot).getItem().equals(fuel)) {
 			playerIn.getCooldownTracker().setCooldown(this, 20);
 			function.accept(playerIn);
 			playerIn.addStat(Stats.ITEM_USED.get(this));

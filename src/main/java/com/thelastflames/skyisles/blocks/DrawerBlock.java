@@ -50,7 +50,7 @@ public class DrawerBlock extends DynamicModelBlock {
 	
 	@Override
 	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		return ((MultiMaterialContainerTE)worldIn.getTileEntity(pos)).onBlockActivated(state,worldIn,pos,player,handIn,hit);
+		return ((MultiMaterialContainerTE) worldIn.getTileEntity(pos)).onBlockActivated(state, worldIn, pos, player, handIn, hit);
 	}
 	
 	@Override
@@ -58,56 +58,56 @@ public class DrawerBlock extends DynamicModelBlock {
 		if (state.getBlock() != newState.getBlock()) {
 			TileEntity tileentity = worldIn.getTileEntity(pos);
 			if (tileentity instanceof MultiMaterialContainerTE) {
-				((MultiMaterialContainerTE)tileentity).onRemove();
+				((MultiMaterialContainerTE) tileentity).onRemove();
 			}
 			
 			super.onReplaced(state, worldIn, pos, newState, isMoving);
 		}
 	}
 	
-	public static final VoxelShape raytraceShapeTop=Block.makeCuboidShape(1,9,0,15,15,15);
-	public static final VoxelShape raytraceShapeBottom=Block.makeCuboidShape(1,1,0,15,7,15);
-	public static final VoxelShape raytraceShape=VoxelShapes.or(
-			Block.makeCuboidShape(0,0,0,1,16,16),
-			Block.makeCuboidShape(15,0,0,16,16,16),
-			Block.makeCuboidShape(0,0,0,16,1,16),
-			Block.makeCuboidShape(0,15,0,16,16,16),
-			Block.makeCuboidShape(0,0,15,16,16,16),
-			Block.makeCuboidShape(0,7,0,16,9,16)
+	public static final VoxelShape raytraceShapeTop = Block.makeCuboidShape(1, 9, 0, 15, 15, 15);
+	public static final VoxelShape raytraceShapeBottom = Block.makeCuboidShape(1, 1, 0, 15, 7, 15);
+	public static final VoxelShape raytraceShape = VoxelShapes.or(
+			Block.makeCuboidShape(0, 0, 0, 1, 16, 16),
+			Block.makeCuboidShape(15, 0, 0, 16, 16, 16),
+			Block.makeCuboidShape(0, 0, 0, 16, 1, 16),
+			Block.makeCuboidShape(0, 15, 0, 16, 16, 16),
+			Block.makeCuboidShape(0, 0, 15, 16, 16, 16),
+			Block.makeCuboidShape(0, 7, 0, 16, 9, 16)
 	);
 	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		Entity player=context.getEntity();
-		double distance=999999;
-		VoxelShape part=raytraceShape;
-		if (player!=null) {
-			Vec3d start=player.getEyePosition(0);
-			Vec3d stop=start.add(player.getLookVec().scale(9));
-			for (AxisAlignedBB bb:raytraceShapeTop.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+		Entity player = context.getEntity();
+		double distance = 999999;
+		VoxelShape part = raytraceShape;
+		if (player != null) {
+			Vec3d start = player.getEyePosition(0);
+			Vec3d stop = start.add(player.getLookVec().scale(9));
+			for (AxisAlignedBB bb : raytraceShapeTop.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=raytraceShapeTop;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = raytraceShapeTop;
 					}
 				}
 			}
-			for (AxisAlignedBB bb:raytraceShapeBottom.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+			for (AxisAlignedBB bb : raytraceShapeBottom.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=raytraceShapeBottom;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = raytraceShapeBottom;
 					}
 				}
 			}
-			for (AxisAlignedBB bb:raytraceShape.toBoundingBoxList()) {
-				Optional<Vec3d> vec3dOptional=bb.offset(pos).rayTrace(start,stop);
+			for (AxisAlignedBB bb : raytraceShape.toBoundingBoxList()) {
+				Optional<Vec3d> vec3dOptional = bb.offset(pos).rayTrace(start, stop);
 				if (vec3dOptional.isPresent()) {
-					if (vec3dOptional.get().distanceTo(start)<distance) {
-						distance=vec3dOptional.get().distanceTo(start);
-						part=raytraceShape;
+					if (vec3dOptional.get().distanceTo(start) < distance) {
+						distance = vec3dOptional.get().distanceTo(start);
+						part = raytraceShape;
 					}
 				}
 			}
@@ -142,13 +142,13 @@ public class DrawerBlock extends DynamicModelBlock {
 		return new MultiMaterialContainerTE();
 	}
 	
-	static StringyHashMap<MaterialList,PreppedModel> modelHashMap=new StringyHashMap<>();
+	static StringyHashMap<MaterialList, PreppedModel> modelHashMap = new StringyHashMap<>();
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		NBTUtil.NBTObjectHolder obj=new NBTUtil.NBTObjectHolder("BlockEntityTag",player.world.getTileEntity(pos).write(new CompoundNBT()));
-		ItemStack stack=new ItemStack(SkyBlocks.DRAWER_BLOCK.getObject2().get());
-		CompoundNBT nbt=obj.Package();
+		NBTUtil.NBTObjectHolder obj = new NBTUtil.NBTObjectHolder("BlockEntityTag", player.world.getTileEntity(pos).write(new CompoundNBT()));
+		ItemStack stack = new ItemStack(SkyBlocks.DRAWER_BLOCK.getObject2().get());
+		CompoundNBT nbt = obj.Package();
 		nbt.remove("x");
 		nbt.remove("y");
 		nbt.remove("z");
@@ -163,31 +163,32 @@ public class DrawerBlock extends DynamicModelBlock {
 		modelHashMap.objects.clear();
 		modelHashMap.keys.clear();
 		if (!modelHashMap.containsKey(listIn)) {
-			ExtrudedTexture texture1=new ExtrudedTexture(
+			ExtrudedTexture texture1 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/lamp_overlay"),
 					new ResourceLocation(listIn.names.get(1)),
-					1,false
+					1, false
 			);
-			ExtrudedTexture texture2=new ExtrudedTexture(
+			ExtrudedTexture texture2 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/lamp_base"),
 					new ResourceLocation(listIn.names.get(0)),
-					1,false
+					1, false
 			);
-			TexturedModel txmdl=
-					Renderer.createExtrudedTextureNoTexCorrection(true,texture1)
+			TexturedModel txmdl =
+					Renderer.createExtrudedTextureNoTexCorrection(true, texture1)
 							.merge(
 //									Renderer.createFlatTexturedModel(texture2.base,true),
-									Renderer.createFlatTexturedModel(texture2.mask,true)
-							).scale(1,1,0.01f).translate(0,0,0.005f);
-			TexturedModel txmdl2=txmdl.translate(0,0,0).merge(
-					txmdl.rotate((float) Math.toRadians(90),0).translate(0,0,16),
-					txmdl.rotate((float) Math.toRadians(180),0).translate(16,0,16),
-					txmdl.rotate((float) Math.toRadians(-90),0).translate(16,0,0),
-					txmdl.rotate(0,(float) Math.toRadians(-90)).translate(0,16,0),
-					txmdl.rotate(0,(float) Math.toRadians(90)).translate(0,0,16)
+									Renderer.createFlatTexturedModel(texture2.mask, true)
+							).scale(1, 1, 0.01f).translate(0, 0, 0.005f);
+			TexturedModel txmdl2 = txmdl.translate(0, 0, 0).merge(
+					txmdl.rotate((float) Math.toRadians(90), 0).translate(0, 0, 16),
+					txmdl.rotate((float) Math.toRadians(180), 0).translate(16, 0, 16),
+					txmdl.rotate((float) Math.toRadians(-90), 0).translate(16, 0, 0),
+					txmdl.rotate(0, (float) Math.toRadians(-90)).translate(0, 16, 0),
+					txmdl.rotate(0, (float) Math.toRadians(90)).translate(0, 0, 16)
 			);
-			PreppedModel mdl=Renderer.prepModel(txmdl2,false);
-			if (posIn.getY()!=-9999) modelHashMap.add(listIn,mdl); else return mdl;
+			PreppedModel mdl = Renderer.prepModel(txmdl2, false);
+			if (posIn.getY() != -9999) modelHashMap.add(listIn, mdl);
+			else return mdl;
 		}
 		return modelHashMap.get(listIn);
 	}
@@ -195,15 +196,16 @@ public class DrawerBlock extends DynamicModelBlock {
 	@Override
 	public boolean preRender(MatrixStack stack, BlockPos pos) {
 		stack.push();
-		if (pos.equals(new BlockPos(0,-9999,0))) {
-			stack.rotate(new Quaternion(90,0,0,true));
-			stack.translate(0,0,-1.f);
+		if (pos.equals(new BlockPos(0, -9999, 0))) {
+			stack.rotate(new Quaternion(90, 0, 0, true));
+			stack.translate(0, 0, -1.f);
 		}
 		return false;
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {}
+	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {
+	}
 	
 	@Override
 	public void postRender(MatrixStack stack, BlockPos pos) {

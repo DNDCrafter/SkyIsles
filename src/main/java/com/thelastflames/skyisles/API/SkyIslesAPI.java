@@ -1,7 +1,12 @@
 package com.thelastflames.skyisles.API;
 
-public class SkyIslesAPI {
-	public static final SkyIslesAPI INSTANCE=new SkyIslesAPI();
+import net.minecraftforge.eventbus.EventBus;
+import net.minecraftforge.eventbus.api.BusBuilder;
+
+public class SkyIslesAPI extends EventBus {
+	public static final SkyIslesAPI INSTANCE = new SkyIslesAPI(new BusBuilder());
 	
-	public SkyIslesAPI() {}
+	public SkyIslesAPI(BusBuilder busBuilder) {
+		super(busBuilder);
+	}
 }

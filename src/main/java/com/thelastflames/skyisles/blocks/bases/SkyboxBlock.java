@@ -32,9 +32,11 @@ public class SkyboxBlock extends FullbrightBlock implements ITileEntityProvider 
 	public ResourceLocation getBackground(World world) {
 		return null;
 	}
+	
 	public ResourceLocation getSky(World world) {
 		return null;
 	}
+	
 	public ResourceLocation getStars(World world) {
 		return null;
 	}

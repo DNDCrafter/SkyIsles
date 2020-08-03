@@ -1,0 +1,39 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "block/block",
+	"textures": {
+		"4": "skyisles:block/item_observer_top_top",
+		"5": "block/observer_top",
+		"bottom": "block/observer_back",
+		"side": "block/observer_side",
+		"top": "skyisles:block/item_observer_top",
+		"particle": "block/observer_front",
+		"front": "block/observer_front"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0],
+			"to": [16, 16, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#front", "cullface": "north"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#side", "cullface": "east"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#bottom", "cullface": "south"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#side", "cullface": "west"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#4", "cullface": "up"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#5", "cullface": "down"}
+			}
+		},
+		{
+			"from": [3.96, 16, 3.96],
+			"to": [12.04, 15, 12.04],
+			"rotation": {"angle": 0, "axis": "y", "origin": [12, 24, 7]},
+			"faces": {
+				"north": {"uv": [3, 4, 4, 12], "texture": "#top", "cullface": "up"},
+				"east": {"uv": [3, 4, 4, 12], "texture": "#top", "cullface": "up"},
+				"south": {"uv": [3, 4, 4, 12], "texture": "#top", "cullface": "up"},
+				"west": {"uv": [3, 4, 4, 12], "texture": "#top", "cullface": "up"},
+				"up": {"uv": [4, 4, 12, 12], "texture": "#top", "cullface": "up"}
+			}
+		}
+	]
+}

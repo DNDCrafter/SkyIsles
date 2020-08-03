@@ -10,22 +10,22 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class MaterialList {
-	public ArrayList<String> names=new ArrayList<>();
+	public ArrayList<String> names = new ArrayList<>();
 	
 	@Override
 	public String toString() {
-		StringBuilder val= new StringBuilder();
-		for (String s:names) {
+		StringBuilder val = new StringBuilder();
+		for (String s : names) {
 			val.append(s).append(";");
 		}
 		return val.toString();
 	}
 	
 	public static MaterialList fromString(String s) {
-		MaterialList list=new MaterialList();
-		for (String s1:s.split(";")) {
+		MaterialList list = new MaterialList();
+		for (String s1 : s.split(";")) {
 			try {
-				if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(s1))!=Items.AIR) {
+				if (ForgeRegistries.ITEMS.getValue(new ResourceLocation(s1)) != Items.AIR) {
 					list.add(ForgeRegistries.ITEMS.getValue(new ResourceLocation(s1)));
 				} else {
 					list.add(s1);
@@ -42,12 +42,12 @@ public class MaterialList {
 	}
 	
 	public void add(Item item) {
-		String returnval=ConfigLookup.lookupImage(item);
+		String returnval = ConfigLookup.lookupImage(item);
 		if (returnval.equals("")) {
-			returnval= Objects.requireNonNull(item.getRegistryName()).getNamespace()+":block/"+item.getRegistryName().getPath();
+			returnval = Objects.requireNonNull(item.getRegistryName()).getNamespace() + ":block/" + item.getRegistryName().getPath();
 			if (!(item instanceof BlockItem)) {
 				if (returnval.contains("_ingot")) {
-					returnval=returnval.replace("_ingot","_block");
+					returnval = returnval.replace("_ingot", "_block");
 				}
 			}
 		}

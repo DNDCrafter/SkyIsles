@@ -13,10 +13,10 @@ import net.minecraftforge.registries.ObjectHolder;
 public class ModEventSubscriber {
 	public static DimensionType DIMENSION = null;
 	
-	static ResourceLocation location=new ResourceLocation("skyisles"+":testdimension");
+	static ResourceLocation location = new ResourceLocation("skyisles" + ":testdimension");
 	
-	@ObjectHolder("skyisles"+":testdimension")
-	public static final ModDimension DIMHOLDER=null;
+	@ObjectHolder("skyisles" + ":testdimension")
+	public static final ModDimension DIMHOLDER = null;
 	
 	@SubscribeEvent
 	public static void onDimensionRegistryEvent(final RegistryEvent.Register<ModDimension> event) {

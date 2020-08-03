@@ -1,0 +1,31 @@
+{
+    "variants": {
+        "facing=up,powered=false,closed=false": { "model": "skyisles:block/item_observer", "x": 270 },
+        "facing=down,powered=false,closed=false": { "model": "skyisles:block/item_observer", "x": 90 },
+        "facing=north,powered=false,closed=false": { "model": "skyisles:block/item_observer" },
+        "facing=south,powered=false,closed=false": { "model": "skyisles:block/item_observer", "y": 180 },
+        "facing=west,powered=false,closed=false": { "model": "skyisles:block/item_observer", "y": 270 },
+        "facing=east,powered=false,closed=false": { "model": "skyisles:block/item_observer", "y": 90 },
+
+        "facing=up,powered=true,closed=false": { "model": "skyisles:block/item_observer_on", "x": 270 },
+        "facing=down,powered=true,closed=false": { "model": "skyisles:block/item_observer_on", "x": 90 },
+        "facing=north,powered=true,closed=false": { "model": "skyisles:block/item_observer_on" },
+        "facing=south,powered=true,closed=false": { "model": "skyisles:block/item_observer_on", "y": 180 },
+        "facing=west,powered=true,closed=false": { "model": "skyisles:block/item_observer_on", "y": 270 },
+        "facing=east,powered=true,closed=false": { "model": "skyisles:block/item_observer_on", "y": 90 },
+
+        "facing=up,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed", "x": 270 },
+        "facing=down,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed", "x": 90 },
+        "facing=north,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed" },
+        "facing=south,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed", "y": 180 },
+        "facing=west,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed", "y": 270 },
+        "facing=east,powered=false,closed=true": { "model": "skyisles:block/item_observer_closed", "y": 90 },
+
+        "facing=up,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on", "x": 270 },
+        "facing=down,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on", "x": 90 },
+        "facing=north,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on" },
+        "facing=south,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on", "y": 180 },
+        "facing=west,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on", "y": 270 },
+        "facing=east,powered=true,closed=true": { "model": "skyisles:block/item_observer_closed_on", "y": 90 }
+    }
+}

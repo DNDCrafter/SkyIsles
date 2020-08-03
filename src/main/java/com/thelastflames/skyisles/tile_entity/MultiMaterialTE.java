@@ -16,7 +16,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
-	public MaterialList materialList=new MaterialList();
+	public MaterialList materialList = new MaterialList();
 	
 	@Override
 	public void read(CompoundNBT nbt, ItemStack stack, BlockState state) {
@@ -36,11 +36,12 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 		super.read(compound);
 		if (!compound.contains("x")) {
 			try {
-				this.pos=new BlockPos(0,-9999,0);
-			} catch (Exception ignored) {}
+				this.pos = new BlockPos(0, -9999, 0);
+			} catch (Exception ignored) {
+			}
 		}
 //		System.out.println(compound.getString("materials"));
-		materialList=MaterialList.fromString(compound.getString("materials"));
+		materialList = MaterialList.fromString(compound.getString("materials"));
 	}
 	
 	@Override
@@ -78,7 +79,7 @@ public class MultiMaterialTE extends TileEntity implements IMultiMaterialTE {
 	@Override
 	public CompoundNBT write(@Nonnull CompoundNBT compound) {
 		super.write(compound);
-		compound.putString("materials",materialList.toString());
+		compound.putString("materials", materialList.toString());
 		return compound;
 	}
 	

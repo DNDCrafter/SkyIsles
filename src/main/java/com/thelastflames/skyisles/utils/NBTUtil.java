@@ -7,28 +7,28 @@ import java.util.UUID;
 
 public class NBTUtil {
 	public static CompoundNBT createNBT(NBTObjectHolder<?>... objects) {
-		CompoundNBT nbt=new CompoundNBT();
-		for (NBTObjectHolder<?> object:objects) {
+		CompoundNBT nbt = new CompoundNBT();
+		for (NBTObjectHolder<?> object : objects) {
 			if (object.getObject() instanceof String) {
-				nbt.putString(object.key,(String) object.object);
+				nbt.putString(object.key, (String) object.object);
 			} else if (object.getObject() instanceof INBT) {
-				nbt.put(object.key,(INBT) object.object);
+				nbt.put(object.key, (INBT) object.object);
 			} else if (object.getObject() instanceof Long) {
-				nbt.putLong(object.key,(Long) object.object);
+				nbt.putLong(object.key, (Long) object.object);
 			} else if (object.getObject() instanceof Float) {
-				nbt.putFloat(object.key,(Float) object.object);
+				nbt.putFloat(object.key, (Float) object.object);
 			} else if (object.getObject() instanceof Double) {
-				nbt.putDouble(object.key,(Double) object.object);
+				nbt.putDouble(object.key, (Double) object.object);
 			} else if (object.getObject() instanceof Integer) {
-				nbt.putInt(object.key,(Integer) object.object);
+				nbt.putInt(object.key, (Integer) object.object);
 			} else if (object.getObject() instanceof Boolean) {
-				nbt.putBoolean(object.key,(Boolean) object.object);
+				nbt.putBoolean(object.key, (Boolean) object.object);
 			} else if (object.getObject() instanceof Byte) {
-				nbt.putByte(object.key,(Byte) object.object);
+				nbt.putByte(object.key, (Byte) object.object);
 			} else if (object.getObject() instanceof Short) {
-				nbt.putShort(object.key,(Short) object.object);
+				nbt.putShort(object.key, (Short) object.object);
 			} else if (object.getObject() instanceof UUID) {
-				nbt.putUniqueId(object.key,(UUID) object.object);
+				nbt.putUniqueId(object.key, (UUID) object.object);
 			}
 		}
 		return nbt;

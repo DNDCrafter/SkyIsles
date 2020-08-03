@@ -55,14 +55,14 @@ public class PillarBlock extends DynamicModelBlock {
 	@Nullable
 	@Override
 	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		return this.getDefaultState().with(DispenserBlock.FACING,context.getFace());
+		return this.getDefaultState().with(DispenserBlock.FACING, context.getFace());
 	}
 	
-	static StringyHashMap<MaterialList,PreppedModel> modelHashMap=new StringyHashMap<>();
+	static StringyHashMap<MaterialList, PreppedModel> modelHashMap = new StringyHashMap<>();
 	
 	@Override
 	public boolean removedByPlayer(BlockState state, World world, BlockPos pos, PlayerEntity player, boolean willHarvest, IFluidState fluid) {
-		return super.removedByPlayer(state,world,pos,player,willHarvest,fluid);
+		return super.removedByPlayer(state, world, pos, player, willHarvest, fluid);
 	}
 	
 	@Override
@@ -84,15 +84,15 @@ public class PillarBlock extends DynamicModelBlock {
 	@Override
 	public PreppedModel getModel(MaterialList listIn, BlockPos posIn, World worldIn) {
 		if (!modelHashMap.containsKey(listIn)) {
-			ExtrudedTexture texture1=new ExtrudedTexture(
+			ExtrudedTexture texture1 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/pillar_base"),
 					new ResourceLocation(listIn.names.get(0)),
-					1,true
+					1, true
 			);
-			ExtrudedTexture texture2=new ExtrudedTexture(
+			ExtrudedTexture texture2 = new ExtrudedTexture(
 					new ResourceLocation("skyisles:block/pillar_overlay"),
 					new ResourceLocation(listIn.names.get(1)),
-					1,true
+					1, true
 			);
 //			PreppedModel mdl=
 //					PreppedModel.merge(
@@ -105,28 +105,29 @@ public class PillarBlock extends DynamicModelBlock {
 //									Renderer.createFlatPreppedModel(texture2.mask,true)
 //							)
 //					);
-			TexturedModel txmdl=
-					Renderer.createExtrudedTextureNoTexCorrection(true,texture1)
-					.merge(
-						Renderer.createFlatTexturedModel(texture2.base,false),
-						Renderer.createFlatTexturedModel(texture2.mask,true)
-					).scale(1,1,0.01f);
-			TexturedModel txmdl2=txmdl.translate(0,0,0).merge(
-					txmdl.rotate((float) Math.toRadians(90),0).translate(0,0,16),
-					txmdl.rotate((float) Math.toRadians(180),0).translate(16,0,16),
-					txmdl.rotate((float) Math.toRadians(-90),0).translate(16,0,0)
+			TexturedModel txmdl =
+					Renderer.createExtrudedTextureNoTexCorrection(true, texture1)
+							.merge(
+									Renderer.createFlatTexturedModel(texture2.base, false),
+									Renderer.createFlatTexturedModel(texture2.mask, true)
+							).scale(1, 1, 0.01f);
+			TexturedModel txmdl2 = txmdl.translate(0, 0, 0).merge(
+					txmdl.rotate((float) Math.toRadians(90), 0).translate(0, 0, 16),
+					txmdl.rotate((float) Math.toRadians(180), 0).translate(16, 0, 16),
+					txmdl.rotate((float) Math.toRadians(-90), 0).translate(16, 0, 0)
 			);
-			PreppedModel mdl=Renderer.prepModel(txmdl2,false);
-			if (posIn.getY()!=-9999) modelHashMap.add(listIn,mdl); else return mdl;
+			PreppedModel mdl = Renderer.prepModel(txmdl2, false);
+			if (posIn.getY() != -9999) modelHashMap.add(listIn, mdl);
+			else return mdl;
 		}
 		return modelHashMap.get(listIn);
 	}
 	
 	@Override
 	public ItemStack getPickBlock(BlockState state, RayTraceResult target, IBlockReader world, BlockPos pos, PlayerEntity player) {
-		NBTUtil.NBTObjectHolder obj=new NBTUtil.NBTObjectHolder("BlockEntityTag",player.world.getTileEntity(pos).write(new CompoundNBT()));
-		ItemStack stack=new ItemStack(SkyBlocks.PILLAR_BLOCK.getObject2().get());
-		CompoundNBT nbt=obj.Package();
+		NBTUtil.NBTObjectHolder obj = new NBTUtil.NBTObjectHolder("BlockEntityTag", player.world.getTileEntity(pos).write(new CompoundNBT()));
+		ItemStack stack = new ItemStack(SkyBlocks.PILLAR_BLOCK.getObject2().get());
+		CompoundNBT nbt = obj.Package();
 		nbt.remove("x");
 		nbt.remove("y");
 		nbt.remove("z");
@@ -138,15 +139,16 @@ public class PillarBlock extends DynamicModelBlock {
 	@Override
 	public boolean preRender(MatrixStack stack, BlockPos pos) {
 		stack.push();
-		if (pos.equals(new BlockPos(0,-9999,0))) {
-			stack.rotate(new Quaternion(90,0,0,true));
-			stack.translate(0,0,-1.f);
+		if (pos.equals(new BlockPos(0, -9999, 0))) {
+			stack.rotate(new Quaternion(90, 0, 0, true));
+			stack.translate(0, 0, -1.f);
 		}
 		return false;
 	}
 	
 	@Override
-	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {}
+	public void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te) {
+	}
 	
 	@Override
 	public void postRender(MatrixStack stack, BlockPos pos) {

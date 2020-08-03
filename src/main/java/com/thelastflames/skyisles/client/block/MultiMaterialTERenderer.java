@@ -20,10 +20,11 @@ import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
 public class MultiMaterialTERenderer extends TileEntityRenderer<TileEntity> {
-	private static MultiMaterialTERenderer INSTANCE=null;
+	private static MultiMaterialTERenderer INSTANCE = null;
+	
 	public MultiMaterialTERenderer(TileEntityRendererDispatcher rendererDispatcherIn) {
 		super(rendererDispatcherIn);
-		INSTANCE=this;
+		INSTANCE = this;
 	}
 	
 	public static MultiMaterialTERenderer getInstance() {
@@ -31,71 +32,50 @@ public class MultiMaterialTERenderer extends TileEntityRenderer<TileEntity> {
 	}
 	
 	public void render(IMultiMaterialTE tileEntityIn, float partialTicks, @Nonnull IRenderTypeBuffer bufferIn, MatrixStack matrixStackIn, int combinedLightIn, int combinedOverlayIn) {
-		//		Date startTime=new Date();
 		matrixStackIn.push();
 		
 		try {
-			if (!((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).preRender(matrixStackIn,tileEntityIn.mgetPos())) {
-				if (tileEntityIn!=null) {
+			SkyIsles.createBFPSGraphSection("skyisles:Setup Matrix", 0.3d, 0.4d, 0.3d);
+			if (!((DynamicModelBlock) tileEntityIn.mgetBlockState().getBlock()).preRender(matrixStackIn, tileEntityIn.mgetPos())) {
+				if (tileEntityIn != null) {
 					if (tileEntityIn.mgetBlockState().has(DispenserBlock.FACING)) {
-						Direction dir=tileEntityIn.mgetBlockState().get(DispenserBlock.FACING);
+						Direction dir = tileEntityIn.mgetBlockState().get(DispenserBlock.FACING);
 						matrixStackIn.rotate(dir.getRotation());
 						if (dir.equals(Direction.NORTH)) {
-							matrixStackIn.translate(-1,-1,-1);
+							matrixStackIn.translate(-1, -1, -1);
 						} else if (dir.equals(Direction.EAST)) {
-							matrixStackIn.translate(-1,0,-1);
+							matrixStackIn.translate(-1, 0, -1);
 						} else if (dir.equals(Direction.SOUTH)) {
-							matrixStackIn.translate(0,0,-1);
-						} else if (dir.equals(Direction.WEST)||dir.equals(Direction.DOWN)) {
-							matrixStackIn.translate(0,-1,-1);
+							matrixStackIn.translate(0, 0, -1);
+						} else if (dir.equals(Direction.WEST) || dir.equals(Direction.DOWN)) {
+							matrixStackIn.translate(0, -1, -1);
 						}
 					}
 				}
 				matrixStackIn.push();
-				matrixStackIn.scale(1/16f,1/16f,1/16f);
-//			System.out.println("start"+new Date().getTime());
-				SkyIsles.createBFPSGraphSection("skyisles:Render Multi Material TE", 0.2d,0.9d,1d);
+				matrixStackIn.scale(1 / 16f, 1 / 16f, 1 / 16f);
 				try {
-					PreppedModel mdl=((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).getModel(((IMultiMaterialTE)tileEntityIn).getMaterialList(),tileEntityIn.mgetPos(),tileEntityIn.mgetWorld());
+					SkyIsles.createBFPSGraphSection("skyisles:Create Or Grab TE Model", 0.9d, 0.2d, 0.8525d);
+					PreppedModel mdl = ((DynamicModelBlock) tileEntityIn.mgetBlockState().getBlock()).getModel(((IMultiMaterialTE) tileEntityIn).getMaterialList(), tileEntityIn.mgetPos(), tileEntityIn.mgetWorld());
+					SkyIsles.createBFPSGraphSection("skyisles:Render Multi Material TE", 0.2d, 0.9d, 1d);
 					matrixStackIn.push();
-//				matrixStackIn.rotate(new Quaternion(0,180,0,true));
-//				matrixStackIn.translate(-16,0,-16);
-//				matrixStackIn.scale(1,1,0.01f);
-					Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn);
+					Renderer.renderPreparedModel(mdl, bufferIn, matrixStackIn, combinedLightIn, combinedOverlayIn);
 					matrixStackIn.pop();
-//				matrixStackIn.push();
-//				matrixStackIn.rotate(new Quaternion(0,90,0,true));
-//				matrixStackIn.translate(-16,0,0);
-//				matrixStackIn.scale(1,1,0.01f);
-//				Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn,16777215);
-//				matrixStackIn.pop();
-//				matrixStackIn.push();
-//				matrixStackIn.rotate(new Quaternion(0,-90,0,true));
-//				matrixStackIn.translate(0,0,-16);
-//				matrixStackIn.scale(1,1,0.01f);
-//				Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn,16777215);
-//				matrixStackIn.pop();
-//				matrixStackIn.push();
-//				matrixStackIn.rotate(new Quaternion(0,0,0,true));
-//				matrixStackIn.translate(0,0,0);
-//				matrixStackIn.scale(1,1,0.01f);
-//				Renderer.renderPreparedModel(mdl,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn,16777215);
-//				matrixStackIn.pop();
 				} catch (Exception ignored) {
 				}
 				matrixStackIn.pop();
 			} else {
-				((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).render(matrixStackIn,bufferIn,null,((MultiMaterialTE)tileEntityIn));
+				((DynamicModelBlock) tileEntityIn.mgetBlockState().getBlock()).render(matrixStackIn, bufferIn, null, ((MultiMaterialTE) tileEntityIn));
 			}
-		} catch (Throwable err) {}
+		} catch (Throwable ignored) {
+		}
 		SkyIsles.endBFPSGraphSection();
-		((DynamicModelBlock)tileEntityIn.mgetBlockState().getBlock()).postRender(matrixStackIn,tileEntityIn.mgetPos());
+		((DynamicModelBlock) tileEntityIn.mgetBlockState().getBlock()).postRender(matrixStackIn, tileEntityIn.mgetPos());
 		matrixStackIn.pop();
-//		System.out.println("timeSpent"+((new Date().getTime())-startTime.getTime()));
 	}
 	
 	@Override
 	public void render(@Nonnull TileEntity tileEntityIn, float partialTicks, MatrixStack matrixStackIn, @Nonnull IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
-		render((IMultiMaterialTE)tileEntityIn,partialTicks,bufferIn,matrixStackIn,combinedLightIn,combinedLightIn);
+		render((IMultiMaterialTE) tileEntityIn, partialTicks, bufferIn, matrixStackIn, combinedLightIn, combinedLightIn);
 	}
 }

@@ -20,7 +20,7 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 	public void generateSurface(@Nonnull WorldGenRegion p_225551_1_, @Nonnull IChunk p_225551_2_) {
 	}
 	
-	private TweakedEndGenerator generator=null;
+	private TweakedEndGenerator generator = null;
 	
 	@Override
 	public int getGroundHeight() {
@@ -159,7 +159,7 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 //						}
 //					}
 //				} catch (Exception err) {}
-		
+
 //		Random r=new Random(chunkIn.getPos().asBlockPos().getX()%1600);
 //		Random r2=new Random(chunkIn.getPos().asBlockPos().getX()%160);
 //		Random r3=new Random(chunkIn.getPos().asBlockPos().getZ()%160);
@@ -168,7 +168,7 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 //		Random r6=new Random((int)(((r.nextLong()*r2.nextInt(5)/r3.nextInt(7))%r4.nextInt(5325))/r5.nextDouble()));
 //
 //		Random r7=new Random(r6.nextLong()*worldIn.getSeed());
-		
+
 //		ArrayList<Integer> ints=new ArrayList<>();
 //		for (int x=0;x<=16;x++) {
 //			for (int z=0;z<=16;z++) {
@@ -176,13 +176,13 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 //			}
 //		}
 		
-		if (generator==null) {
-			generator=new TweakedEndGenerator(worldIn,this.biomeProvider,new EndGenerationSettings());
+		if (generator == null) {
+			generator = new TweakedEndGenerator(worldIn, this.biomeProvider, new EndGenerationSettings());
 		}
-		generator.makeBase(worldIn,chunkIn);
+		generator.makeBase(worldIn, chunkIn);
 		
-		for (int x=16;x>=0;x--) {
-			for (int z=16;z>=0;z--) {
+		for (int x = 16; x >= 0; x--) {
+			for (int z = 16; z >= 0; z--) {
 //				int f = 0;
 //				int gi = 0;
 //				for (int i=0;i<ints.size();i++) {
@@ -193,30 +193,31 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 //				}
 //				ints.remove(gi);
 				
-				BlockState topBlock=Blocks.GRASS_BLOCK.getDefaultState();
-				BlockState middleBlock=Blocks.STONE.getDefaultState();
-				BlockState bottomBlock=Blocks.WHITE_STAINED_GLASS.getDefaultState();
+				BlockState topBlock = Blocks.GRASS_BLOCK.getDefaultState();
+				BlockState middleBlock = Blocks.STONE.getDefaultState();
+				BlockState bottomBlock = Blocks.WHITE_STAINED_GLASS.getDefaultState();
 				try {
-					topBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getTopBlock();
-					middleBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getMiddleBlock();
-					bottomBlock=((BiomeBase)this.getBiomeProvider().getNoiseBiome(x,0,z)).getBottomBlock();
-				} catch (Exception ignored) {}
-				int ystart=generator.func_222529_a(x+chunkIn.getPos().getXStart(),z+chunkIn.getPos().getZStart(), Heightmap.Type.WORLD_SURFACE);
-				boolean noblock=true;
-				for (int i=ystart;i>=0;i--) {
-					BlockPos pos=new BlockPos(x+chunkIn.getPos().getXStart(),i,z+chunkIn.getPos().getZStart());
-					if (worldIn.getBlockState(pos).isAir(world,pos)) {
+					topBlock = ((BiomeBase) this.getBiomeProvider().getNoiseBiome(x, 0, z)).getTopBlock();
+					middleBlock = ((BiomeBase) this.getBiomeProvider().getNoiseBiome(x, 0, z)).getMiddleBlock();
+					bottomBlock = ((BiomeBase) this.getBiomeProvider().getNoiseBiome(x, 0, z)).getBottomBlock();
+				} catch (Exception ignored) {
+				}
+				int ystart = generator.func_222529_a(x + chunkIn.getPos().getXStart(), z + chunkIn.getPos().getZStart(), Heightmap.Type.WORLD_SURFACE);
+				boolean noblock = true;
+				for (int i = ystart; i >= 0; i--) {
+					BlockPos pos = new BlockPos(x + chunkIn.getPos().getXStart(), i, z + chunkIn.getPos().getZStart());
+					if (worldIn.getBlockState(pos).isAir(world, pos)) {
 						if (!noblock) {
 							if (worldIn.getBlockState(pos.up()).equals(middleBlock)) {
-								worldIn.setBlockState(pos.up(),bottomBlock,0);
+								worldIn.setBlockState(pos.up(), bottomBlock, 0);
 							}
 						}
-						noblock=true;
+						noblock = true;
 					} else {
 						if (noblock) {
-							worldIn.setBlockState(pos,topBlock,0);
+							worldIn.setBlockState(pos, topBlock, 0);
 						}
-						noblock=false;
+						noblock = false;
 					}
 				}
 //				worldIn.setBlockState(new BlockPos(x+chunkIn.getPos().getXStart(),i-1,z+chunkIn.getPos().getZStart()),Blocks.GRASS_BLOCK.getDefaultState(),0);
@@ -234,7 +235,7 @@ public class TestGenerator extends ChunkGenerator<GenerationSettings> {
 //						break;
 //					}
 //				}
-				
+
 //				EndChunkGenerator generator=new EndChunkGenerator(worldIn,this.biomeProvider,new EndGenerationSettings());
 //				int y=generator.func_222529_a((int)((x+chunkIn.getPos().asBlockPos().getX())*2),(int)((z+chunkIn.getPos().asBlockPos().getZ())*2), Heightmap.Type.WORLD_SURFACE);
 //				int y2=(-(y-52))+0;

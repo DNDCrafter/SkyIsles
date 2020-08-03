@@ -1,7 +1,10 @@
 package com.thelastflames.skyisles;
 
+import com.thelastflames.skyisles.API.SkyIslesAPI;
+import com.thelastflames.skyisles.API.events.blocks.GetSkyboxBlocksEvent;
 import com.thelastflames.skyisles.API.events.recipe.ForgeRecipesEvent;
 import com.thelastflames.skyisles.API.utils.ToolForgeRecipe;
+import com.thelastflames.skyisles.blocks.bases.SkyboxBlock;
 import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.*;
 import com.thelastflames.skyisles.utils.MaterialList;
@@ -45,7 +48,7 @@ public class SkyIsles {
 	// Directly reference a log4j logger.
 	public static final Logger LOGGER = LogManager.getLogger();
 	
-	public static final String ModID="skyisles";
+	public static final String ModID = "skyisles";
 	
 	private static SkyIsles INSTANCE;
 	
@@ -54,15 +57,17 @@ public class SkyIsles {
 	}
 	
 	final IEventBus bus;
+	
 	public SkyIsles() {
-		INSTANCE=this;
+		INSTANCE = this;
 		
-		bus=FMLJavaModLoadingContext.get().getModEventBus();
+		bus = FMLJavaModLoadingContext.get().getModEventBus();
 		
 		bus.addListener(this::clientSetupEvent);
-		bus.addGenericListener(ContainerType.class,this::registerContainers);
+		bus.addGenericListener(ContainerType.class, this::registerContainers);
 		bus.addListener(this::commonSetup);
-		bus.addListener(this::setupForgeRecipes);
+		SkyIslesAPI.INSTANCE.addListener(this::setupForgeRecipes);
+		SkyIslesAPI.INSTANCE.addListener(this::collectSkyboxBlocks);
 		
 		ITSERLookup.setupLookup();
 		
@@ -92,42 +97,47 @@ public class SkyIsles {
 		ClientSetup.run(event);
 	}
 	
+	public void collectSkyboxBlocks(GetSkyboxBlocksEvent event) {
+		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK_PURPLE.getObject1().get());
+		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK.getObject1().get());
+	}
+	
 	public void setupForgeRecipes(ForgeRecipesEvent event) {
 		event.register(new ResourceLocation("skyisles", "metal_pickaxe"), new ToolForgeRecipe() {
 			@Override
 			public boolean checkMatch(ArrayList<ItemStack> stacks) {
-				return  stacks.get(0).isEmpty()&&
-						checkMetalHead(stacks.get(1))&&
-						checkMetalHead(stacks.get(2))&&
-						stacks.get(3).isEmpty()&&
+				return stacks.get(0).isEmpty() &&
+						checkMetalHead(stacks.get(1)) &&
+						checkMetalHead(stacks.get(2)) &&
+						stacks.get(3).isEmpty() &&
 						(
-								stacks.get(4).getItem().getTags().contains(new ResourceLocation("minecraft:planks"))||
-								stacks.get(4).getItem().getTags().contains(Tags.Items.RODS.getId())||
-								stacks.get(4).getItem().getTags().contains(Tags.Items.BONES.getId())||
-								stacks.get(4).getItem().equals(Items.BAMBOO)
-						)&&
-						(stacks.get(5).getItem().equals(stacks.get(1).getItem()))&&
+								stacks.get(4).getItem().getTags().contains(new ResourceLocation("minecraft:planks")) ||
+										stacks.get(4).getItem().getTags().contains(Tags.Items.RODS.getId()) ||
+										stacks.get(4).getItem().getTags().contains(Tags.Items.BONES.getId()) ||
+										stacks.get(4).getItem().equals(Items.BAMBOO)
+						) &&
+						(stacks.get(5).getItem().equals(stacks.get(1).getItem())) &&
 						(
-								stacks.get(6).getItem().getTags().contains(Tags.Items.LEATHER.getId())||
-								stacks.get(6).getItem().getRegistryName().equals(Items.RABBIT_HIDE.getRegistryName())
-						)&&
-						stacks.get(7).isEmpty()&&
+								stacks.get(6).getItem().getTags().contains(Tags.Items.LEATHER.getId()) ||
+										stacks.get(6).getItem().getRegistryName().equals(Items.RABBIT_HIDE.getRegistryName())
+						) &&
+						stacks.get(7).isEmpty() &&
 						stacks.get(8).isEmpty();
 			}
 			
 			@Override
 			public ItemStack getOutput(ArrayList<ItemStack> stacks) {
-				if (stacks!=null) {
-					ItemStack stack=new ItemStack(SkyItems.METAL_PICKAXE.get());
-					CompoundNBT nbt=stack.getOrCreateTag();
-					MaterialList list=new MaterialList();
+				if (stacks != null) {
+					ItemStack stack = new ItemStack(SkyItems.METAL_PICKAXE.get());
+					CompoundNBT nbt = stack.getOrCreateTag();
+					MaterialList list = new MaterialList();
 					
-					nbt.putString("mat_stick_leather",stacks.get(6).getItem().getRegistryName().toString());
-					nbt.putString("mat_head_metal1",stacks.get(1).getItem().getRegistryName().toString());
-					nbt.putString("mat_head_metal2",stacks.get(2).getItem().getRegistryName().toString());
-					nbt.putString("mat_stick_wood",stacks.get(4).getItem().getRegistryName().toString());
+					nbt.putString("mat_stick_leather", stacks.get(6).getItem().getRegistryName().toString());
+					nbt.putString("mat_head_metal1", stacks.get(1).getItem().getRegistryName().toString());
+					nbt.putString("mat_head_metal2", stacks.get(2).getItem().getRegistryName().toString());
+					nbt.putString("mat_stick_wood", stacks.get(4).getItem().getRegistryName().toString());
 					
-					nbt.putString("materials",list.toString());
+					nbt.putString("materials", list.toString());
 					return stack;
 				} else {
 					return new ItemStack(SkyItems.METAL_PICKAXE.get());
@@ -140,20 +150,20 @@ public class SkyIsles {
 						SkyIsles.checkMetalHead(stack);
 			}
 			
-			int indexIngot=0;
-			int indexGem=1;
-			int indexStick=0;
-			int indexLeather=0;
-			int renderCalls=0;
+			int indexIngot = 0;
+			int indexGem = 1;
+			int indexStick = 0;
+			int indexLeather = 0;
+			int renderCalls = 0;
 			
 			@Override
 			public void renderRecipe() {
 				renderCalls++;
-
+				
 				//Collect usable materials
-				ArrayList<Item> leather=new ArrayList<>();
-				ArrayList<Item> sticks=new ArrayList<>();
-				ArrayList<Item> head=new ArrayList<>();
+				ArrayList<Item> leather = new ArrayList<>();
+				ArrayList<Item> sticks = new ArrayList<>();
+				ArrayList<Item> head = new ArrayList<>();
 				for (Tag.ITagEntry<Item> itemITagEntry : Tags.Items.INGOTS.getEntries()) {
 					itemITagEntry.populate(head);
 				}
@@ -194,40 +204,40 @@ public class SkyIsles {
 				leather.add(Items.RABBIT_HIDE);
 				
 				//Cycle through materials
-				if (renderCalls>=30) {
-					renderCalls=0;
+				if (renderCalls >= 30) {
+					renderCalls = 0;
 					indexIngot++;
-					if (indexIngot>=head.size()) {
-						indexIngot=0;
+					if (indexIngot >= head.size()) {
+						indexIngot = 0;
 					}
 					
 					indexLeather++;
-					if (indexLeather>=leather.size()) {
-						indexLeather=0;
+					if (indexLeather >= leather.size()) {
+						indexLeather = 0;
 					}
 					
 					indexStick++;
-					if (indexStick>=sticks.size()) {
-						indexStick=0;
+					if (indexStick >= sticks.size()) {
+						indexStick = 0;
 					}
 					
 					indexGem++;
-					if (indexGem>=head.size()) {
-						indexGem=0;
+					if (indexGem >= head.size()) {
+						indexGem = 0;
 					}
 				}
 				
 				//Render input
-				ItemRenderer itemRenderer=Minecraft.getInstance().getItemRenderer();
+				ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
 				
-				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)),18*1,18*0,itemRenderer);
-				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexIngot)),18*2,18*0,itemRenderer);
-				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(sticks.get(indexStick)),18*1,18*1,itemRenderer);
-				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)),18*2,18*1,itemRenderer);
-				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(leather.get(indexLeather)),18*0,18*2,itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)), 18 * 1, 18 * 0, itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexIngot)), 18 * 2, 18 * 0, itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(sticks.get(indexStick)), 18 * 1, 18 * 1, itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(head.get(indexGem)), 18 * 2, 18 * 1, itemRenderer);
+				UserInterfaceUtils.renderRecipeItemWithTool(new ItemStack(leather.get(indexLeather)), 18 * 0, 18 * 2, itemRenderer);
 				
 				//Render output
-				ArrayList<ItemStack> stacks=new ArrayList<>();
+				ArrayList<ItemStack> stacks = new ArrayList<>();
 				stacks.add(null);
 				stacks.add(new ItemStack(head.get(indexGem)));
 				stacks.add(new ItemStack(head.get(indexIngot)));
@@ -235,24 +245,24 @@ public class SkyIsles {
 				stacks.add(new ItemStack(sticks.get(indexStick)));
 				stacks.add(null);
 				stacks.add(new ItemStack(leather.get(indexLeather)));
-				UserInterfaceUtils.renderRecipeItem(this.getOutput(stacks),18*4+10,18,itemRenderer);
+				UserInterfaceUtils.renderRecipeItem(this.getOutput(stacks), 18 * 4 + 10, 18, itemRenderer);
 			}
 		});
 	}
 	
 	public static boolean checkMetalHead(ItemStack stack) {
-		return  stack.isBeaconPayment()||
-				stack.getItem().getTags().contains(new ResourceLocation("minecraft:planks"))||
-				stack.getItem().getTags().contains(Tags.Items.COBBLESTONE.getId())||
-				stack.getItem().getTags().contains(Tags.Items.GEMS.getId())||
-				stack.getItem().getTags().contains(Tags.Items.INGOTS.getId())||
+		return stack.isBeaconPayment() ||
+				stack.getItem().getTags().contains(new ResourceLocation("minecraft:planks")) ||
+				stack.getItem().getTags().contains(Tags.Items.COBBLESTONE.getId()) ||
+				stack.getItem().getTags().contains(Tags.Items.GEMS.getId()) ||
+				stack.getItem().getTags().contains(Tags.Items.INGOTS.getId()) ||
 				stack.getItem().getTags().contains(Tags.Items.STONE.getId());
 	}
 	
 	public static void postEvent(Event event) {
-		getInstance().bus.post(event);
+		SkyIslesAPI.INSTANCE.post(event);
 	}
-	
+
 //	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 //	public static class CommonRegistry {
 //		@SubscribeEvent
@@ -281,11 +291,15 @@ public class SkyIsles {
 	}
 	
 	public static void createBFPSGraphSection(String name, double r, double g, double b) {
-		BetterFPSGraphWrapper.createSection(name,r,g,b);
+		BetterFPSGraphWrapper.createSection(name, r, g, b);
 	}
 	
 	public static void createBFPSGraphSection(String name, int r, int g, int b) {
-		BetterFPSGraphWrapper.createSection(name,r/255d,g/255d,b/255d);
+		BetterFPSGraphWrapper.createSection(name, r / 255d, g / 255d, b / 255d);
+	}
+	
+	public static void createBFPSGraphSection(String name) {
+		BetterFPSGraphWrapper.createSection(name);
 	}
 	
 	public static void endBFPSGraphSection() {

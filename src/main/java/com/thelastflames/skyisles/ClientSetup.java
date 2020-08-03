@@ -1,5 +1,6 @@
 package com.thelastflames.skyisles;
 
+import com.thelastflames.skyisles.client.block.ItemObserverRenderer;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
 import com.thelastflames.skyisles.client.block.SkyboxRenderer;
 import com.thelastflames.skyisles.client.gui.ForgeScreen;
@@ -23,17 +24,23 @@ public class ClientSetup {
 		registerTERS();
 		setupRenderLayers();
 	}
+	
 	public static void setupColors() {
 	}
+	
 	public static void registerTERS() {
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.MULTIMATERIALTE.get(), MultiMaterialTERenderer::new);
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.LAMPTE.get(), MultiMaterialTERenderer::new);
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.SKYBOX.get(), SkyboxRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.ITEM_OBSERVER.get(), ItemObserverRenderer::new);
 	}
+	
 	public static void setupRenderLayers() {
 		RenderTypeLookup.setRenderLayer(SkyBlocks.LAMP_BLOCK.getObject1().get(), RenderType.getCutout());
 		RenderTypeLookup.setRenderLayer(SkyBlocks.DRAWER_BLOCK.getObject1().get(), RenderType.getCutout());
+		RenderTypeLookup.setRenderLayer(SkyBlocks.ITEM_OBSERVER.getObject1().get(), RenderType.getCutout());
 	}
+	
 	public static void setupGUIs() {
 		ScreenManager.registerFactory(ForgeContainer.TYPE, ForgeScreen::new);
 	}

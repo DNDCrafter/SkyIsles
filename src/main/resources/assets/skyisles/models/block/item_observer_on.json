@@ -1,0 +1,13 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "skyisles:block/item_observer",
+	"textures": {
+		"4": "skyisles:block/item_observer_top_top",
+		"5": "block/observer_top",
+		"bottom": "block/observer_back_on",
+		"side": "block/observer_side",
+		"top": "skyisles:block/item_observer_top",
+		"particle": "block/observer_front",
+		"front": "block/observer_front"
+	}
+}

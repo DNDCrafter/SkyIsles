@@ -8,11 +8,12 @@ public class SkyIslesSkyboxBlock extends SkyboxBlock {
 	private final ResourceLocation bg;
 	private final ResourceLocation sky;
 	private final ResourceLocation stars;
+	
 	public SkyIslesSkyboxBlock(Properties properties, ResourceLocation bg, ResourceLocation sky, ResourceLocation stars) {
 		super(properties);
-		this.bg=bg;
-		this.sky=sky;
-		this.stars=stars;
+		this.bg = bg;
+		this.sky = sky;
+		this.stars = stars;
 	}
 	
 	@Override

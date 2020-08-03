@@ -25,29 +25,30 @@ import javax.annotation.Nullable;
 public class SkyBlocks {
 	public static final DeferredRegister<Block> BLOCKS = new DeferredRegister<>(ForgeRegistries.BLOCKS, SkyIsles.ModID);
 	
-	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag",new NBTUtil.NBTObjectHolder<>("materials","minecraft:iron_ingot;minecraft:gold_ingot").Package())));
-	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", new LampBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag",new NBTUtil.NBTObjectHolder<>("materials","minecraft:glowstone;minecraft:black_concrete").Package())));
-	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", new DrawerBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:spruce_wood;minecraft:iron_block").Package())));
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:iron_ingot;minecraft:gold_ingot").Package())));
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", new LampBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:glowstone;minecraft:black_concrete").Package())));
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", new DrawerBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:spruce_wood;minecraft:iron_block").Package())));
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> SKYBOX_BLOCK = registerBlockWithItem("skybox_test", new SkyIslesSkyboxBlock(Block.Properties.from(Blocks.COBBLESTONE),
 			new ResourceLocation("skyisles:textures/block/skybox.png"),
 			new ResourceLocation("skyisles:textures/block/skybox_pass.png"),
-			new ResourceLocation("skyisles:textures/block/skybox_pass_stars.png")), 64, CreativeTabs.BUILDING_BLOCKS,null, null);
+			new ResourceLocation("skyisles:textures/block/skybox_pass_stars.png")), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> SKYBOX_BLOCK_PURPLE = registerBlockWithItem("skybox_test_purple", new SkyIslesSkyboxBlock(Block.Properties.from(Blocks.COBBLESTONE),
 			new ResourceLocation("skyisles:textures/block/skybox_purple.png"),
 			new ResourceLocation("skyisles:textures/block/skybox_pass_purple.png"),
-			new ResourceLocation("textures/entity/end_portal.png")), 64, CreativeTabs.BUILDING_BLOCKS,null, null);
-	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> FORGE_BLOCK = registerBlockWithItem("forge_block", new ForgeBlock(), 64, CreativeTabs.BUILDING_BLOCKS,null, null);
-	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> TREE_SPAWNER_BLOCK = registerBlockWithItem("tree_spawner", new StructureSpawnerBlock(new SimpleTree()), 64, CreativeTabs.BUILDING_BLOCKS,null, null);
+			new ResourceLocation("textures/entity/end_portal.png")), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> FORGE_BLOCK = registerBlockWithItem("forge_block", new ForgeBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> ITEM_OBSERVER = registerBlockWithItem("item_observer", new ItemObserver(Block.Properties.from(Blocks.OBSERVER)), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> TREE_SPAWNER_BLOCK = registerBlockWithItem("tree_spawner", new StructureSpawnerBlock(new SimpleTree()), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 	
 	public static BiRegistry<RegistryObject<Block>, RegistryObject<Item>> registerBlockWithItem(String name, Block block, int maxStack, @Nullable ItemGroup group, @Nullable Rarity rarity, @Nullable CompoundNBT defaultNBT) {
 		Item.Properties properties = new Item.Properties();
-		if (group!=null) properties.group(group);
-		if (rarity!=null) properties.rarity(rarity);
-		if (ITSERLookup.contains(name)) properties.setISTER(()->()->ITSERLookup.get(name));
+		if (group != null) properties.group(group);
+		if (rarity != null) properties.rarity(rarity);
+		if (ITSERLookup.contains(name)) properties.setISTER(() -> () -> ITSERLookup.get(name));
 		properties.maxStackSize(maxStack);
 		return new BiRegistry<>(
-				BLOCKS.register(name,()->block),
-				SkyItems.ITEMS.register(name,()->(defaultNBT!=null?new DefaultNBTBlockItem(block,properties,defaultNBT):new BlockItem(block, properties)))
+				BLOCKS.register(name, () -> block),
+				SkyItems.ITEMS.register(name, () -> (defaultNBT != null ? new DefaultNBTBlockItem(block, properties, defaultNBT) : new BlockItem(block, properties)))
 		);
 	}
 }

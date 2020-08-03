@@ -5,6 +5,6 @@ import net.minecraftforge.eventbus.api.Event;
 
 import java.util.ArrayList;
 
-public class GetSkyboxBlocks extends Event {
+public class GetSkyboxBlocksEvent extends Event {
 	public final ArrayList<SkyboxBlock> blocks = new ArrayList<>();
 }

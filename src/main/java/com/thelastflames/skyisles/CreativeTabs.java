@@ -16,7 +16,7 @@ public class CreativeTabs {
 	public static final ItemGroup TOOLS = new ItemGroup("skyisles_tools") {
 		@Override
 		public ItemStack createIcon() {
-			return new ItemStack(SkyItems.ARTIFACTS.get(SkyItems.ARTIFACTS.size()-1).get());
+			return new ItemStack(SkyItems.ARTIFACTS.get(SkyItems.ARTIFACTS.size() - 1).get());
 		}
 	};
 }

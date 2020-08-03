@@ -8,12 +8,13 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.HashMap;
 
 public class ForgeRecipesEvent extends Event {
-	private final HashMap<ResourceLocation, ToolForgeRecipe> recipeHashMap=new HashMap<>();
+	private final HashMap<ResourceLocation, ToolForgeRecipe> recipeHashMap = new HashMap<>();
 	
-	public ForgeRecipesEvent() {}
+	public ForgeRecipesEvent() {
+	}
 	
-	public void register(ResourceLocation location,ToolForgeRecipe recipe) {
-		recipeHashMap.put(location,recipe);
+	public void register(ResourceLocation location, ToolForgeRecipe recipe) {
+		recipeHashMap.put(location, recipe);
 	}
 	
 	public void finish() {

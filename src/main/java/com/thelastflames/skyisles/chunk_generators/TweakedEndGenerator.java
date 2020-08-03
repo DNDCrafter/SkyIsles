@@ -31,7 +31,7 @@ public class TweakedEndGenerator extends NoiseChunkGenerator<EndGenerationSettin
 	}
 	
 	protected double[] getBiomeNoiseColumn(int noiseX, int noiseZ) {
-		return new double[]{(double)this.biomeProvider.func_222365_c(noiseX, noiseZ), 0.0D};
+		return new double[]{(double) this.biomeProvider.func_222365_c(noiseX, noiseZ), 0.0D};
 	}
 	
 	protected double func_222545_a(double p_222545_1_, double p_222545_3_, int p_222545_5_) {
@@ -39,7 +39,7 @@ public class TweakedEndGenerator extends NoiseChunkGenerator<EndGenerationSettin
 	}
 	
 	protected double func_222551_g() {
-		return (double)((int)super.func_222551_g() / 2);
+		return (double) ((int) super.func_222551_g() / 2);
 	}
 	
 	protected double func_222553_h() {

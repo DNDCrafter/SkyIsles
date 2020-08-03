@@ -30,7 +30,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	}
 	
 	public Inventory(NonNullList<ItemStack> inventoryContents) {
-		this.slotsCount=inventoryContents.size();
+		this.slotsCount = inventoryContents.size();
 		this.inventoryContents = inventoryContents;
 	}
 	
@@ -74,7 +74,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	public ItemStack func_223374_a(Item p_223374_1_, int p_223374_2_) {
 		ItemStack itemstack = new ItemStack(p_223374_1_, 0);
 		
-		for(int i = this.slotsCount - 1; i >= 0; --i) {
+		for (int i = this.slotsCount - 1; i >= 0; --i) {
 			ItemStack itemstack1 = this.getStackInSlot(i);
 			if (itemstack1.getItem().equals(p_223374_1_)) {
 				int j = p_223374_2_ - itemstack.getCount();
@@ -137,7 +137,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	}
 	
 	public boolean isEmpty() {
-		for(ItemStack itemstack : this.inventoryContents) {
+		for (ItemStack itemstack : this.inventoryContents) {
 			if (!itemstack.isEmpty()) {
 				return false;
 			}
@@ -152,7 +152,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	 */
 	public void markDirty() {
 		if (this.listeners != null) {
-			for(IInventoryChangedListener iinventorychangedlistener : this.listeners) {
+			for (IInventoryChangedListener iinventorychangedlistener : this.listeners) {
 				iinventorychangedlistener.onInventoryChanged(this);
 			}
 		}
@@ -172,7 +172,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	}
 	
 	public void fillStackedContents(RecipeItemHelper helper) {
-		for(ItemStack itemstack : this.inventoryContents) {
+		for (ItemStack itemstack : this.inventoryContents) {
 			helper.accountStack(itemstack);
 		}
 		
@@ -185,7 +185,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	}
 	
 	private void func_223375_b(ItemStack p_223375_1_) {
-		for(int i = 0; i < this.slotsCount; ++i) {
+		for (int i = 0; i < this.slotsCount; ++i) {
 			ItemStack itemstack = this.getStackInSlot(i);
 			if (itemstack.isEmpty()) {
 				this.setInventorySlotContents(i, p_223375_1_.copy());
@@ -197,7 +197,7 @@ public class Inventory implements IInventory, IRecipeHelperPopulator {
 	}
 	
 	private void func_223372_c(ItemStack p_223372_1_) {
-		for(int i = 0; i < this.slotsCount; ++i) {
+		for (int i = 0; i < this.slotsCount; ++i) {
 			ItemStack itemstack = this.getStackInSlot(i);
 			if (ItemStack.areItemsEqual(itemstack, p_223372_1_)) {
 				this.func_223373_a(p_223372_1_, itemstack);

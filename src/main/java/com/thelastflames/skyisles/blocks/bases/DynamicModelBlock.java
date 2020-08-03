@@ -33,7 +33,7 @@ public abstract class DynamicModelBlock extends Block implements ITileEntityProv
 		);
 	}
 	
-	public DynamicModelBlock(Material mat,SoundType soundType,int harvestLevel,ToolType... toolTypes) {
+	public DynamicModelBlock(Material mat, SoundType soundType, int harvestLevel, ToolType... toolTypes) {
 		super(Properties.create(mat)
 				.hardnessAndResistance(3.0F, 40.0F)
 				.sound(SoundType.STONE)
@@ -59,9 +59,11 @@ public abstract class DynamicModelBlock extends Block implements ITileEntityProv
 	public abstract PreppedModel getModel(MaterialList listIn, BlockPos posIn, World worldIn);
 	
 	//return true to cancel normal render
-	public abstract boolean preRender(MatrixStack stack,BlockPos pos);
+	public abstract boolean preRender(MatrixStack stack, BlockPos pos);
+	
 	//handle custom render
-	public abstract void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl,MultiMaterialTE te);
+	public abstract void render(MatrixStack stack, IRenderTypeBuffer buffer, PreppedModel mdl, MultiMaterialTE te);
+	
 	//fix matrix if you used preRender
-	public abstract void postRender(MatrixStack stack,BlockPos pos);
+	public abstract void postRender(MatrixStack stack, BlockPos pos);
 }

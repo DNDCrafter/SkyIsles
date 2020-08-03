@@ -105,7 +105,7 @@ dependencies {
     //TODO:UPDATE TO 2994933
     compile fg.deobf("curse.maven:dynamic-renderer:2994933")
 
-    compile fg.deobf("curse.maven:better-fps-graph:3021769")
+    compile fg.deobf("curse.maven:better-fps-graph:3021886")
 
     runtimeOnly fg.deobf("curse.maven:enchanted-book-redesign:2968446")
     runtimeOnly fg.deobf("curse.maven:place-preview:2975672")

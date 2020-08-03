@@ -13,11 +13,11 @@ import org.apache.logging.log4j.Level;
 @Mod.EventBusSubscriber(modid = "skyisles", bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventBusSubscriber {
 	
-	static ResourceLocation location=new ResourceLocation("skyisles","testdimension");
+	static ResourceLocation location = new ResourceLocation("skyisles", "testdimension");
 	
 	@SubscribeEvent
 	public static void onRegisterDimensionsEvent(final RegisterDimensionsEvent event) {
-		SkyIsles.LOGGER.log(Level.INFO,"hello from forge dimension registry");
+		SkyIsles.LOGGER.log(Level.INFO, "hello from forge dimension registry");
 		if (DimensionType.byName(location) == null) {
 			System.out.println("register dimension");
 			ModEventSubscriber.DIMENSION = DimensionManager.registerDimension(location, ModEventSubscriber.DIMHOLDER, new PacketBuffer(Unpooled.buffer()), true);

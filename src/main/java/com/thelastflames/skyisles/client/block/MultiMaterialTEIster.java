@@ -33,10 +33,10 @@ public class MultiMaterialTEIster implements IISter {
 //			te.read(((DefaultNBTBlockItem)itemStackIn.getItem()).getDefaultNBT().getCompound("BlockEntityTag"));
 //			MultiMaterialTERenderer.getInstance().render(te,0,matrixStackIn,bufferIn,combinedLightIn,combinedOverlayIn);
 //		}
-		BlockItem item=((BlockItem)itemStackIn.getItem());
-		IMultiMaterialTE te=(IMultiMaterialTE)item.getBlock().createTileEntity(item.getBlock().getDefaultState(),null);
-		CompoundNBT nbt=(CompoundNBT)itemStackIn.getOrCreateTag().get("BlockEntityTag");
-		te.read(nbt,itemStackIn,item.getBlock().getDefaultState());
-		MultiMaterialTERenderer.getInstance().render(te,0,bufferIn,matrixStackIn,combinedLightIn,combinedOverlayIn);
+		BlockItem item = ((BlockItem) itemStackIn.getItem());
+		IMultiMaterialTE te = (IMultiMaterialTE) item.getBlock().createTileEntity(item.getBlock().getDefaultState(), null);
+		CompoundNBT nbt = (CompoundNBT) itemStackIn.getOrCreateTag().get("BlockEntityTag");
+		te.read(nbt, itemStackIn, item.getBlock().getDefaultState());
+		MultiMaterialTERenderer.getInstance().render(te, 0, bufferIn, matrixStackIn, combinedLightIn, combinedOverlayIn);
 	}
 }

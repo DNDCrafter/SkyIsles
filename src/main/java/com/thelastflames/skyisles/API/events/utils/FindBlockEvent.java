@@ -7,7 +7,7 @@ public class FindBlockEvent extends Event {
 	public final Item input;
 	public Item output;
 	
-	public FindBlockEvent(Item input,Item output) {
+	public FindBlockEvent(Item input, Item output) {
 		this.input = input;
 		this.output = output;
 	}
