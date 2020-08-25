@@ -96,23 +96,18 @@ public class ChestTESR extends TileEntityRenderer<ChestTE> {
 				icallbackwrapper = TileEntityMerger.ICallback::func_225537_b_;
 			}
 			
-//			float f1 = icallbackwrapper.apply(net.minecraft.block.ChestBlock.func_226917_a_((IChestLid)tileEntityIn)).get(partialTicks);
-			float f1 = 0;
+			float f1 = tileEntityIn.getLidAngle(partialTicks);
 			f1 = 1.0F - f1;
 			f1 = 1.0F - f1 * f1 * f1;
 			int i = icallbackwrapper.apply(new DualBrightnessCallback<>()).applyAsInt(combinedLightIn);
-//			Material material = this.getMaterial(tileEntityIn);
-//			System.out.println(material);
 			
 			String suffix = "_"+tileEntityIn.getBlockState().get(ChestBlock.TYPE).getName();
-//			System.out.println(suffix);
 			IVertexBuilder ivertexbuilder;
 			if (suffix.equals("_single")) {
 				ivertexbuilder = bufferIn.getBuffer(RenderType.getEntitySolid(new ResourceLocation("skyisles:textures/entity/chest/"+ChestBlock.getType(tileEntityIn.getBlockState()).name.toLowerCase()+".png")));
 			} else {
 				ivertexbuilder = bufferIn.getBuffer(RenderType.getEntitySolid(new ResourceLocation("skyisles:textures/entity/chest/"+ChestBlock.getType(tileEntityIn.getBlockState()).name.toLowerCase()+suffix+".png")));
 			}
-//			IVertexBuilder ivertexbuilder = material.getBuffer(bufferIn, RenderType::getEntityCutout);
 			if (flag1) {
 				if (chesttype == ChestType.LEFT) {
 					this.renderModels(matrixStackIn, ivertexbuilder, this.leftLid, this.leftLatch, this.leftBottom, f1, i, combinedOverlayIn);
