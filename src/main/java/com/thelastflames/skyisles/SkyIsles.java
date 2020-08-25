@@ -1,9 +1,11 @@
 package com.thelastflames.skyisles;
 
 import com.thelastflames.skyisles.API.SkyIslesAPI;
+import com.thelastflames.skyisles.API.events.blocks.GetChestBlocksEvent;
 import com.thelastflames.skyisles.API.events.blocks.GetSkyboxBlocksEvent;
 import com.thelastflames.skyisles.API.events.recipe.ForgeRecipesEvent;
 import com.thelastflames.skyisles.API.utils.ToolForgeRecipe;
+import com.thelastflames.skyisles.blocks.ChestBlock;
 import com.thelastflames.skyisles.blocks.bases.SkyboxBlock;
 import com.thelastflames.skyisles.containers.ForgeContainer;
 import com.thelastflames.skyisles.registry.*;
@@ -68,6 +70,7 @@ public class SkyIsles {
 		bus.addListener(this::commonSetup);
 		SkyIslesAPI.INSTANCE.addListener(this::setupForgeRecipes);
 		SkyIslesAPI.INSTANCE.addListener(this::collectSkyboxBlocks);
+		SkyIslesAPI.INSTANCE.addListener(this::collectChestBlocks);
 		
 		ITSERLookup.setupLookup();
 		
@@ -100,6 +103,10 @@ public class SkyIsles {
 	public void collectSkyboxBlocks(GetSkyboxBlocksEvent event) {
 		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK_PURPLE.getObject1().get());
 		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK.getObject1().get());
+	}
+	
+	public void collectChestBlocks(GetChestBlocksEvent event) {
+		event.blocks.add((ChestBlock) SkyBlocks.CHEST_BLOCK.getObject1().get());
 	}
 	
 	public void setupForgeRecipes(ForgeRecipesEvent event) {

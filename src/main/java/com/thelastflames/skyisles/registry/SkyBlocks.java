@@ -39,6 +39,8 @@ public class SkyBlocks {
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> FORGE_BLOCK = registerBlockWithItem("forge_block", new ForgeBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> ITEM_OBSERVER = registerBlockWithItem("item_observer", new ItemObserver(Block.Properties.from(Blocks.OBSERVER)), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> TREE_SPAWNER_BLOCK = registerBlockWithItem("tree_spawner", new StructureSpawnerBlock(new SimpleTree()), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
+
+	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> CHEST_BLOCK = registerBlockWithItem("chest", new ChestBlock(SkyTileEntities.CHEST_TE::get), 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 	
 	public static BiRegistry<RegistryObject<Block>, RegistryObject<Item>> registerBlockWithItem(String name, Block block, int maxStack, @Nullable ItemGroup group, @Nullable Rarity rarity, @Nullable CompoundNBT defaultNBT) {
 		Item.Properties properties = new Item.Properties();

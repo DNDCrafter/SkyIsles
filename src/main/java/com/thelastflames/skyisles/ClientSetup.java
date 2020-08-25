@@ -1,5 +1,6 @@
 package com.thelastflames.skyisles;
 
+import com.thelastflames.skyisles.client.block.ChestTESR;
 import com.thelastflames.skyisles.client.block.ItemObserverRenderer;
 import com.thelastflames.skyisles.client.block.MultiMaterialTERenderer;
 import com.thelastflames.skyisles.client.block.SkyboxRenderer;
@@ -33,6 +34,7 @@ public class ClientSetup {
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.LAMPTE.get(), MultiMaterialTERenderer::new);
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.SKYBOX.get(), SkyboxRenderer::new);
 		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.ITEM_OBSERVER.get(), ItemObserverRenderer::new);
+		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.CHEST_TE.get(), ChestTESR::new);
 	}
 	
 	public static void setupRenderLayers() {

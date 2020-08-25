@@ -107,7 +107,7 @@ dependencies {
 
     compile fg.deobf("curse.maven:better-fps-graph:3021886")
 
-    runtimeOnly fg.deobf("curse.maven:enchanted-book-redesign:2968446")
-    runtimeOnly fg.deobf("curse.maven:place-preview:2975672")
+//    runtimeOnly fg.deobf("curse.maven:enchanted-book-redesign:2968446")
+//    runtimeOnly fg.deobf("curse.maven:place-preview:2975672")
 //    implementation 'com.github.GiantLuigi4:Dynamic_Renderer:-SNAPSHOT'
 }
