@@ -1,44 +1,42 @@
 package com.thelastflames.skyisles.blocks.bases;
 
+import com.thelastflames.skyisles.tile_entity.ChestTE;
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
-import net.minecraft.block.*;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.CatEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.IFluidState;
-import net.minecraft.inventory.DoubleSidedInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
-import net.minecraft.inventory.container.ChestContainer;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.INamedContainerProvider;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.pathfinding.PathType;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.DirectionProperty;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer;
-import net.minecraft.state.properties.BlockStateProperties;
-import net.minecraft.state.properties.ChestType;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.tileentity.*;
-import net.minecraft.util.*;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Cat;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.pathfinder.PathComputationType;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -46,305 +44,325 @@ import java.util.Optional;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
-public class Chest<O extends TileEntity> extends AbstractChestBlock<O> implements IWaterLoggable {
-	public static final DirectionProperty FACING = HorizontalBlock.HORIZONTAL_FACING;
-	public static final EnumProperty<ChestType> TYPE = BlockStateProperties.CHEST_TYPE;
-	public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-	protected static final VoxelShape SHAPE_NORTH = Block.makeCuboidShape(1.0D, 0.0D, 0.0D, 15.0D, 14.0D, 15.0D);
-	protected static final VoxelShape SHAPE_SOUTH = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 16.0D);
-	protected static final VoxelShape SHAPE_WEST = Block.makeCuboidShape(0.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
-	protected static final VoxelShape SHAPE_EAST = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 16.0D, 14.0D, 15.0D);
-	protected static final VoxelShape field_196315_B = Block.makeCuboidShape(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
-	private static final TileEntityMerger.ICallback<IInventory, Optional<IInventory>> field_220109_i = new TileEntityMerger.ICallback<IInventory, Optional<IInventory>>() {
-		public Optional<IInventory> func_225539_a_(IInventory p_225539_1_, IInventory p_225539_2_) {
-			return Optional.of(new DoubleSidedInventory(p_225539_1_, p_225539_2_));
-		}
-		
-		public Optional<IInventory> func_225538_a_(IInventory p_225538_1_) {
-			return Optional.of(p_225538_1_);
-		}
-		
-		public Optional<IInventory> func_225537_b_() {
-			return Optional.empty();
-		}
-	};
-	private static final TileEntityMerger.ICallback<LockableLootTileEntity, Optional<INamedContainerProvider>> field_220110_j = new TileEntityMerger.ICallback<LockableLootTileEntity, Optional<INamedContainerProvider>>() {
-		public Optional<INamedContainerProvider> func_225539_a_(final LockableLootTileEntity p_225539_1_, final LockableLootTileEntity p_225539_2_) {
-			final IInventory iinventory = new DoubleSidedInventory(p_225539_1_, p_225539_2_);
-			return Optional.of(new INamedContainerProvider() {
-				@Nullable
-				public Container createMenu(int p_createMenu_1_, PlayerInventory p_createMenu_2_, PlayerEntity p_createMenu_3_) {
-					if (p_225539_1_.canOpen(p_createMenu_3_) && p_225539_2_.canOpen(p_createMenu_3_)) {
-						p_225539_1_.fillWithLoot(p_createMenu_2_.player);
-						p_225539_2_.fillWithLoot(p_createMenu_2_.player);
-						return ChestContainer.createGeneric9X6(p_createMenu_1_, p_createMenu_2_, iinventory);
-					} else {
-						return null;
-					}
-				}
-				
-				public ITextComponent getDisplayName() {
-					if (p_225539_1_.hasCustomName()) {
-						return p_225539_1_.getDisplayName();
-					} else {
-						return (ITextComponent)(p_225539_2_.hasCustomName() ? p_225539_2_.getDisplayName() : new TranslationTextComponent("container.chestDouble"));
-					}
-				}
-			});
-		}
-		
-		@Override
-		public Optional<INamedContainerProvider> func_225538_a_(LockableLootTileEntity p_225538_1_) {
-			return Optional.empty();
-		}
-		
-		public Optional<INamedContainerProvider> func_225538_a_(INamedContainerProvider p_225538_1_) {
-			return Optional.of(p_225538_1_);
-		}
-		
-		public Optional<INamedContainerProvider> func_225537_b_() {
-			return Optional.empty();
-		}
-	};
-	
-	protected Chest(Block.Properties builder, Supplier<TileEntityType<? extends O>> tileEntityTypeIn) {
-		super(builder, tileEntityTypeIn);
-		this.setDefaultState(this.stateContainer.getBaseState().with(FACING, Direction.NORTH).with(TYPE, ChestType.SINGLE).with(WATERLOGGED, Boolean.valueOf(false)));
-	}
-	
-	public static TileEntityMerger.Type func_226919_h_(BlockState p_226919_0_) {
-		ChestType chesttype = p_226919_0_.get(TYPE);
-		if (chesttype == ChestType.SINGLE) {
-			return TileEntityMerger.Type.SINGLE;
-		} else {
-			return chesttype == ChestType.RIGHT ? TileEntityMerger.Type.FIRST : TileEntityMerger.Type.SECOND;
-		}
-	}
-	
-	public BlockRenderType getRenderType(BlockState state) {
-		return BlockRenderType.ENTITYBLOCK_ANIMATED;
-	}
-	
-	/**
-	 * Update the provided state given the provided neighbor facing and neighbor state, returning a new state.
-	 * For example, fences make their connections to the passed in state if possible, and wet concrete powder immediately
-	 * returns its solidified counterpart.
-	 * Note that this method should ideally consider only the specific face passed in.
-	 */
-	public BlockState updatePostPlacement(BlockState stateIn, Direction facing, BlockState facingState, IWorld worldIn, BlockPos currentPos, BlockPos facingPos) {
-		if (stateIn.get(WATERLOGGED)) {
-			worldIn.getPendingFluidTicks().scheduleTick(currentPos, Fluids.WATER, Fluids.WATER.getTickRate(worldIn));
-		}
-		
-		if (facingState.getBlock() == this && facing.getAxis().isHorizontal()) {
-			ChestType chesttype = facingState.get(TYPE);
-			if (stateIn.get(TYPE) == ChestType.SINGLE && chesttype != ChestType.SINGLE && stateIn.get(FACING) == facingState.get(FACING) && getDirectionToAttached(facingState) == facing.getOpposite()) {
-				return stateIn.with(TYPE, chesttype.opposite());
-			}
-		} else if (getDirectionToAttached(stateIn) == facing) {
-			return stateIn.with(TYPE, ChestType.SINGLE);
-		}
-		
-		return super.updatePostPlacement(stateIn, facing, facingState, worldIn, currentPos, facingPos);
-	}
-	
-	public VoxelShape getShape(BlockState state, IBlockReader worldIn, BlockPos pos, ISelectionContext context) {
-		if (state.get(TYPE) == ChestType.SINGLE) {
-			return field_196315_B;
-		} else {
-			switch(getDirectionToAttached(state)) {
-				case NORTH:
-				default:
-					return SHAPE_NORTH;
-				case SOUTH:
-					return SHAPE_SOUTH;
-				case WEST:
-					return SHAPE_WEST;
-				case EAST:
-					return SHAPE_EAST;
-			}
-		}
-	}
-	
-	/**
-	 * Returns a facing pointing from the given state to its attached double chest
-	 */
-	public static Direction getDirectionToAttached(BlockState state) {
-		Direction direction = state.get(FACING);
-		return state.get(TYPE) == ChestType.LEFT ? direction.rotateY() : direction.rotateYCCW();
-	}
-	
-	public BlockState getStateForPlacement(BlockItemUseContext context) {
-		ChestType chesttype = ChestType.SINGLE;
-		Direction direction = context.getPlacementHorizontalFacing().getOpposite();
-		IFluidState ifluidstate = context.getWorld().getFluidState(context.getPos());
-		boolean flag = context.func_225518_g_();
-		Direction direction1 = context.getFace();
-		if (direction1.getAxis().isHorizontal() && flag) {
-			Direction direction2 = this.getDirectionToAttach(context, direction1.getOpposite());
-			if (direction2 != null && direction2.getAxis() != direction1.getAxis()) {
-				direction = direction2;
-				chesttype = direction2.rotateYCCW() == direction1.getOpposite() ? ChestType.RIGHT : ChestType.LEFT;
-			}
-		}
-		
-		if (chesttype == ChestType.SINGLE && !flag) {
-			if (direction == this.getDirectionToAttach(context, direction.rotateY())) {
-				chesttype = ChestType.LEFT;
-			} else if (direction == this.getDirectionToAttach(context, direction.rotateYCCW())) {
-				chesttype = ChestType.RIGHT;
-			}
-		}
-		
-		return this.getDefaultState().with(FACING, direction).with(TYPE, chesttype).with(WATERLOGGED, Boolean.valueOf(ifluidstate.getFluid() == Fluids.WATER));
-	}
-	
-	public IFluidState getFluidState(BlockState state) {
-		return state.get(WATERLOGGED) ? Fluids.WATER.getStillFluidState(false) : super.getFluidState(state);
-	}
-	
-	/**
-	 * Returns facing pointing to a chest to form a double chest with, null otherwise
-	 */
-	@Nullable
-	private Direction getDirectionToAttach(BlockItemUseContext p_196312_1_, Direction p_196312_2_) {
-		BlockState blockstate = p_196312_1_.getWorld().getBlockState(p_196312_1_.getPos().offset(p_196312_2_));
-		return blockstate.getBlock() == this && blockstate.get(TYPE) == ChestType.SINGLE ? blockstate.get(FACING) : null;
-	}
-	
-	/**
-	 * Called by ItemBlocks after a block is set in the world, to allow post-place logic
-	 */
-	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-		if (stack.hasDisplayName()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
-			if (tileentity instanceof LockableTileEntity) {
-				((LockableTileEntity)tileentity).setCustomName(stack.getDisplayName());
-			}
-		}
-		
-	}
-	
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving) {
-		if (state.getBlock() != newState.getBlock()) {
-			TileEntity tileentity = worldIn.getTileEntity(pos);
-			if (tileentity instanceof IInventory) {
-				InventoryHelper.dropInventoryItems(worldIn, pos, (IInventory)tileentity);
-				worldIn.updateComparatorOutputLevel(pos, this);
-			}
-			
-			super.onReplaced(state, worldIn, pos, newState, isMoving);
-		}
-	}
-	
-	public ActionResultType onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit) {
-		if (worldIn.isRemote) {
-			return ActionResultType.SUCCESS;
-		} else {
-			INamedContainerProvider inamedcontainerprovider = this.getContainer(state, worldIn, pos);
-			if (inamedcontainerprovider != null) {
-				player.openContainer(inamedcontainerprovider);
-				player.addStat(this.getOpenStat());
-			}
-			
-			return ActionResultType.SUCCESS;
-		}
-	}
-	
-	protected Stat<ResourceLocation> getOpenStat() {
-		return Stats.CUSTOM.get(Stats.OPEN_CHEST);
-	}
-	
-	@Nullable
-	public static IInventory func_226916_a_(Chest<?> p_226916_0_, BlockState p_226916_1_, World p_226916_2_, BlockPos p_226916_3_, boolean p_226916_4_) {
-		return p_226916_0_.func_225536_a_(p_226916_1_, p_226916_2_, p_226916_3_, p_226916_4_).apply(field_220109_i).orElse((IInventory)null);
-	}
-	
-	public TileEntityMerger.ICallbackWrapper<? extends ChestTileEntity> func_225536_a_(BlockState p_225536_1_, World p_225536_2_, BlockPos p_225536_3_, boolean p_225536_4_) {
-		BiPredicate<IWorld, BlockPos> bipredicate;
-		if (p_225536_4_) {
-			bipredicate = (p_226918_0_, p_226918_1_) -> {
-				return false;
-			};
-		} else {
-			bipredicate = Chest::isBlocked;
-		}
-		
-		return (TileEntityMerger.ICallbackWrapper<? extends ChestTileEntity>) TileEntityMerger.func_226924_a_(this.tileEntityType.get(), ChestBlock::func_226919_h_, ChestBlock::getDirectionToAttached, FACING, p_225536_1_, p_225536_2_, p_225536_3_, bipredicate);
-	}
-	
-	@Nullable
-	public INamedContainerProvider getContainer(BlockState state, World worldIn, BlockPos pos) {
-		return this.func_225536_a_(state, worldIn, pos, false).apply(field_220110_j).orElse(null);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	public static TileEntityMerger.ICallback<IChestLid, Float2FloatFunction> func_226917_a_(final IChestLid p_226917_0_) {
-		return new TileEntityMerger.ICallback<IChestLid, Float2FloatFunction>() {
-			public Float2FloatFunction func_225539_a_(IChestLid p_225539_1_, IChestLid p_225539_2_) {
-				return (p_226921_2_) -> {
-					return Math.max(p_225539_1_.getLidAngle(p_226921_2_), p_225539_2_.getLidAngle(p_226921_2_));
-				};
-			}
-			
-			public Float2FloatFunction func_225538_a_(IChestLid p_225538_1_) {
-				return p_225538_1_::getLidAngle;
-			}
-			
-			public Float2FloatFunction func_225537_b_() {
-				return p_226917_0_::getLidAngle;
-			}
-		};
-	}
-	
-	public TileEntity createNewTileEntity(IBlockReader worldIn) {
-//		return O.create(new CompoundNBT());
-		return null;
-	}
-	
-	public static boolean isBlocked(IWorld p_220108_0_, BlockPos p_220108_1_) {
-		return isBelowSolidBlock(p_220108_0_, p_220108_1_) || isCatSittingOn(p_220108_0_, p_220108_1_);
-	}
-	
-	private static boolean isBelowSolidBlock(IBlockReader p_176456_0_, BlockPos worldIn) {
-		BlockPos blockpos = worldIn.up();
-		return p_176456_0_.getBlockState(blockpos).isNormalCube(p_176456_0_, blockpos);
-	}
-	
-	private static boolean isCatSittingOn(IWorld p_220107_0_, BlockPos p_220107_1_) {
-		List<CatEntity> list = p_220107_0_.getEntitiesWithinAABB(CatEntity.class, new AxisAlignedBB((double)p_220107_1_.getX(), (double)(p_220107_1_.getY() + 1), (double)p_220107_1_.getZ(), (double)(p_220107_1_.getX() + 1), (double)(p_220107_1_.getY() + 2), (double)(p_220107_1_.getZ() + 1)));
-		if (!list.isEmpty()) {
-			for(CatEntity catentity : list) {
-				if (catentity.isSitting()) {
-					return true;
-				}
-			}
-		}
-		
-		return false;
-	}
-	
-	public boolean hasComparatorInputOverride(BlockState state) {
-		return true;
-	}
-	
-	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos) {
-		return Container.calcRedstoneFromInventory(func_226916_a_(this, blockState, worldIn, pos, false));
-	}
-	
-	public BlockState rotate(BlockState state, Rotation rot) {
-		return state.with(FACING, rot.rotate(state.get(FACING)));
-	}
-	
-	public BlockState mirror(BlockState state, Mirror mirrorIn) {
-		return state.rotate(mirrorIn.toRotation(state.get(FACING)));
-	}
-	
-	protected void fillStateContainer(StateContainer.Builder<Block, BlockState> builder) {
-		builder.add(FACING, TYPE, WATERLOGGED);
-	}
-	
-	public boolean allowsMovement(BlockState state, IBlockReader worldIn, BlockPos pos, PathType type) {
-		return false;
-	}
+
+public abstract class Chest<O extends BaseContainerBlockEntity> extends AbstractChestBlock<O> implements SimpleWaterloggedBlock {
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<ChestType> TYPE = BlockStateProperties.CHEST_TYPE;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final int EVENT_SET_OPEN_COUNT = 1;
+    protected static final int AABB_OFFSET = 1;
+    protected static final int AABB_HEIGHT = 14;
+    protected static final VoxelShape NORTH_AABB = Block.box(1.0D, 0.0D, 0.0D, 15.0D, 14.0D, 15.0D);
+    protected static final VoxelShape SOUTH_AABB = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 16.0D);
+    protected static final VoxelShape WEST_AABB = Block.box(0.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
+    protected static final VoxelShape EAST_AABB = Block.box(1.0D, 0.0D, 1.0D, 16.0D, 14.0D, 15.0D);
+    protected static final VoxelShape AABB = Block.box(1.0D, 0.0D, 1.0D, 15.0D, 14.0D, 15.0D);
+    private static final DoubleBlockCombiner.Combiner<BaseContainerBlockEntity, Optional<Container>> CHEST_COMBINER = new DoubleBlockCombiner.Combiner<>() {
+        public Optional<Container> acceptDouble(BaseContainerBlockEntity p_51591_, BaseContainerBlockEntity p_51592_) {
+            return Optional.of(new CompoundContainer(p_51591_, p_51592_));
+        }
+
+        public Optional<Container> acceptSingle(BaseContainerBlockEntity p_51589_) {
+            return Optional.of(p_51589_);
+        }
+
+        public Optional<Container> acceptNone() {
+            return Optional.empty();
+        }
+    };
+    private static final DoubleBlockCombiner.Combiner<BaseContainerBlockEntity, Optional<MenuProvider>> MENU_PROVIDER_COMBINER = new DoubleBlockCombiner.Combiner<>() {
+        public Optional<MenuProvider> acceptDouble(final BaseContainerBlockEntity p_51604_, final BaseContainerBlockEntity p_51605_) {
+            final Container container = new CompoundContainer(p_51604_, p_51605_);
+            return Optional.of(new MenuProvider() {
+                @Nullable
+                public AbstractContainerMenu createMenu(int p_51622_, Inventory p_51623_, Player p_51624_) {
+                    if (p_51604_.canOpen(p_51624_) && p_51605_.canOpen(p_51624_)) {
+                        ((RandomizableContainerBlockEntity) p_51604_).unpackLootTable(p_51623_.player);
+                        ((RandomizableContainerBlockEntity) p_51604_).unpackLootTable(p_51623_.player);
+                        return ChestMenu.sixRows(p_51622_, p_51623_, container);
+                    } else {
+                        return null;
+                    }
+                }
+
+                public Component getDisplayName() {
+                    if (p_51604_.hasCustomName()) {
+                        return p_51604_.getDisplayName();
+                    } else {
+                        return p_51605_.hasCustomName() ? p_51605_.getDisplayName() : Component.translatable("container.chestDouble");
+                    }
+                }
+            });
+        }
+
+        public Optional<MenuProvider> acceptSingle(BaseContainerBlockEntity p_51602_) {
+            return Optional.of(p_51602_);
+        }
+
+        public Optional<MenuProvider> acceptNone() {
+            return Optional.empty();
+        }
+    };
+
+    public Chest(BlockBehaviour.Properties p_51490_, Supplier<BlockEntityType<? extends O>> p_51491_) {
+        super(p_51490_, p_51491_);
+        this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(TYPE, ChestType.SINGLE).setValue(WATERLOGGED, Boolean.valueOf(false)));
+    }
+
+    public static DoubleBlockCombiner.BlockType getBlockType(BlockState p_51583_) {
+        ChestType chesttype = p_51583_.getValue(TYPE);
+        if (chesttype == ChestType.SINGLE) {
+            return DoubleBlockCombiner.BlockType.SINGLE;
+        } else {
+            return chesttype == ChestType.RIGHT ? DoubleBlockCombiner.BlockType.FIRST : DoubleBlockCombiner.BlockType.SECOND;
+        }
+    }
+
+    public RenderShape getRenderShape(BlockState p_51567_) {
+        return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+
+    public boolean canMerge(BlockState state0, BlockState state1) {
+        return state0.getBlock().equals(state1.getBlock());
+    }
+
+    public BlockState updateShape(BlockState state0, Direction p_51556_, BlockState state1, LevelAccessor p_51558_, BlockPos p_51559_, BlockPos p_51560_) {
+        if (state0.getValue(WATERLOGGED)) {
+            p_51558_.scheduleTick(p_51559_, Fluids.WATER, Fluids.WATER.getTickDelay(p_51558_));
+        }
+
+        if (state1.is(this) && p_51556_.getAxis().isHorizontal()) {
+            if (canMerge(state0, state1)) {
+                ChestType chesttype = state1.getValue(TYPE);
+                if (state0.getValue(TYPE) == ChestType.SINGLE && chesttype != ChestType.SINGLE && state0.getValue(FACING) == state1.getValue(FACING) && getConnectedDirection(state1) == p_51556_.getOpposite()) {
+                    return state0.setValue(TYPE, chesttype.getOpposite());
+                }
+            }
+        } else if (getConnectedDirection(state0) == p_51556_) {
+            return state0.setValue(TYPE, ChestType.SINGLE);
+        }
+
+        return super.updateShape(state0, p_51556_, state1, p_51558_, p_51559_, p_51560_);
+    }
+
+    public VoxelShape getShape(BlockState p_51569_, BlockGetter p_51570_, BlockPos p_51571_, CollisionContext p_51572_) {
+        if (p_51569_.getValue(TYPE) == ChestType.SINGLE) {
+            return AABB;
+        } else {
+            switch (getConnectedDirection(p_51569_)) {
+                case NORTH:
+                default:
+                    return NORTH_AABB;
+                case SOUTH:
+                    return SOUTH_AABB;
+                case WEST:
+                    return WEST_AABB;
+                case EAST:
+                    return EAST_AABB;
+            }
+        }
+    }
+
+    public static Direction getConnectedDirection(BlockState state) {
+        Direction direction = state.getValue(FACING);
+        return state.getValue(TYPE) == ChestType.LEFT ? direction.getClockWise() : direction.getCounterClockWise();
+    }
+
+    public abstract BlockState stateFor(ItemStack itemInHand);
+
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState state = stateFor(context.getItemInHand());
+
+        ChestType chesttype = ChestType.SINGLE;
+        Direction direction = context.getHorizontalDirection().getOpposite();
+        FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
+        boolean flag = context.isSecondaryUseActive();
+        Direction direction1 = context.getClickedFace();
+        if (direction1.getAxis().isHorizontal() && flag) {
+            Direction direction2 = this.candidatePartnerFacing(context, state, direction1.getOpposite());
+            if (direction2 != null && direction2.getAxis() != direction1.getAxis()) {
+                direction = direction2;
+                chesttype = direction2.getCounterClockWise() == direction1.getOpposite() ? ChestType.RIGHT : ChestType.LEFT;
+            }
+        }
+
+        if (chesttype == ChestType.SINGLE && !flag) {
+            if (direction == this.candidatePartnerFacing(context, state, direction.getClockWise())) {
+                chesttype = ChestType.LEFT;
+            } else if (direction == this.candidatePartnerFacing(context, state, direction.getCounterClockWise())) {
+                chesttype = ChestType.RIGHT;
+            }
+        }
+
+        return state.setValue(FACING, direction).setValue(TYPE, chesttype).setValue(WATERLOGGED, Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
+    }
+
+    public FluidState getFluidState(BlockState p_51581_) {
+        return p_51581_.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(p_51581_);
+    }
+
+    @Nullable
+    private Direction candidatePartnerFacing(BlockPlaceContext context, BlockState state, Direction p_51496_) {
+        BlockState blockstate = context.getLevel().getBlockState(context.getClickedPos().relative(p_51496_));
+
+        if (canMerge(state, blockstate)) {
+            return blockstate.is(this) && blockstate.getValue(TYPE) == ChestType.SINGLE ? blockstate.getValue(FACING) : null;
+        }
+        return null;
+    }
+
+    public void setPlacedBy(Level p_51503_, BlockPos p_51504_, BlockState p_51505_, LivingEntity p_51506_, ItemStack p_51507_) {
+        if (p_51507_.hasCustomHoverName()) {
+            BlockEntity blockentity = p_51503_.getBlockEntity(p_51504_);
+            if (blockentity instanceof BaseContainerBlockEntity) {
+                ((O) blockentity).setCustomName(p_51507_.getHoverName());
+            }
+        }
+    }
+
+    public void onRemove(BlockState p_51538_, Level p_51539_, BlockPos p_51540_, BlockState p_51541_, boolean p_51542_) {
+        if (!p_51538_.is(p_51541_.getBlock())) {
+            BlockEntity blockentity = p_51539_.getBlockEntity(p_51540_);
+            if (blockentity instanceof Container) {
+                Containers.dropContents(p_51539_, p_51540_, (Container) blockentity);
+                p_51539_.updateNeighbourForOutputSignal(p_51540_, this);
+            }
+
+            super.onRemove(p_51538_, p_51539_, p_51540_, p_51541_, p_51542_);
+        }
+    }
+
+    public InteractionResult use(BlockState p_51531_, Level p_51532_, BlockPos p_51533_, Player p_51534_, InteractionHand p_51535_, BlockHitResult p_51536_) {
+        if (p_51532_.isClientSide) {
+            return InteractionResult.SUCCESS;
+        } else {
+            MenuProvider menuprovider = this.getMenuProvider(p_51531_, p_51532_, p_51533_);
+            if (menuprovider != null) {
+                p_51534_.openMenu(menuprovider);
+                p_51534_.awardStat(this.getOpenChestStat());
+                PiglinAi.angerNearbyPiglins(p_51534_, true);
+            }
+
+            return InteractionResult.CONSUME;
+        }
+    }
+
+    protected Stat<ResourceLocation> getOpenChestStat() {
+        return Stats.CUSTOM.get(Stats.OPEN_CHEST);
+    }
+
+    public BlockEntityType<? extends O> blockEntityType() {
+        return this.blockEntityType.get();
+    }
+
+    @Nullable
+    public static Container getContainer(Chest p_51512_, BlockState p_51513_, Level p_51514_, BlockPos p_51515_, boolean p_51516_) {
+        Object o = p_51512_.combine(p_51513_, p_51514_, p_51515_, p_51516_).apply(CHEST_COMBINER);
+        if (o == null) return null;
+        if (o instanceof Optional<?>)
+            return (Container) ((Optional<?>) o).orElse(null);
+        return null;
+    }
+
+    // java generics are unparalleled in their ability to not work
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public DoubleBlockCombiner.NeighborCombineResult combine(BlockState p_51544_, Level p_51545_, BlockPos p_51546_, boolean p_51547_) {
+        BiPredicate<LevelAccessor, BlockPos> bipredicate;
+        if (p_51547_) {
+            bipredicate = (p_51578_, p_51579_) -> false;
+        } else {
+            bipredicate = Chest::isChestBlockedAt;
+        }
+
+        return DoubleBlockCombiner.combineWithNeigbour(this.blockEntityType.get(), Chest::getBlockType, Chest::getConnectedDirection, FACING, p_51544_, p_51545_, p_51546_, bipredicate);
+    }
+
+    @Nullable
+    public MenuProvider getMenuProvider(BlockState p_51574_, Level p_51575_, BlockPos p_51576_) {
+        Object o = this.combine(p_51574_, p_51575_, p_51576_, false).apply(MENU_PROVIDER_COMBINER);
+        if (o == null) return null;
+        if (o instanceof Optional<?>)
+            return (MenuProvider) ((Optional<?>) o).orElse(null);
+        return null;
+    }
+
+    public static DoubleBlockCombiner.Combiner<BaseContainerBlockEntity, Float2FloatFunction> opennessCombiner(final LidBlockEntity p_51518_) {
+        return new DoubleBlockCombiner.Combiner<BaseContainerBlockEntity, Float2FloatFunction>() {
+            public Float2FloatFunction acceptDouble(BaseContainerBlockEntity p_51633_, BaseContainerBlockEntity p_51634_) {
+                return (p_51638_) -> {
+                    return Math.max(((LidBlockEntity) p_51633_).getOpenNess(p_51638_), ((LidBlockEntity) p_51634_).getOpenNess(p_51638_));
+                };
+            }
+
+            public Float2FloatFunction acceptSingle(BaseContainerBlockEntity p_51631_) {
+                return ((LidBlockEntity) p_51631_)::getOpenNess;
+            }
+
+            public Float2FloatFunction acceptNone() {
+                return p_51518_::getOpenNess;
+            }
+        };
+    }
+
+    @Nullable
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153055_, BlockState p_153056_, BlockEntityType<T> p_153057_) {
+        // not dealing with generics
+        //noinspection unchecked
+        return p_153055_.isClientSide ? createTickerHelper(p_153057_, (BlockEntityType) this.blockEntityType(), ChestTE::lidAnimateTick) : null;
+    }
+
+    public static boolean isChestBlockedAt(LevelAccessor p_51509_, BlockPos p_51510_) {
+        return isBlockedChestByBlock(p_51509_, p_51510_) || isCatSittingOnChest(p_51509_, p_51510_);
+    }
+
+    private static boolean isBlockedChestByBlock(BlockGetter p_51500_, BlockPos p_51501_) {
+        BlockPos blockpos = p_51501_.above();
+        return p_51500_.getBlockState(blockpos).isRedstoneConductor(p_51500_, blockpos);
+    }
+
+    private static boolean isCatSittingOnChest(LevelAccessor p_51564_, BlockPos p_51565_) {
+        List<Cat> list = p_51564_.getEntitiesOfClass(Cat.class, new AABB((double) p_51565_.getX(), (double) (p_51565_.getY() + 1), (double) p_51565_.getZ(), (double) (p_51565_.getX() + 1), (double) (p_51565_.getY() + 2), (double) (p_51565_.getZ() + 1)));
+        if (!list.isEmpty()) {
+            for (Cat cat : list) {
+                if (cat.isInSittingPose()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean hasAnalogOutputSignal(BlockState p_51520_) {
+        return true;
+    }
+
+    public int getAnalogOutputSignal(BlockState p_51527_, Level p_51528_, BlockPos p_51529_) {
+        return AbstractContainerMenu.getRedstoneSignalFromContainer(getContainer(this, p_51527_, p_51528_, p_51529_, false));
+    }
+
+    public BlockState rotate(BlockState p_51552_, Rotation p_51553_) {
+        return p_51552_.setValue(FACING, p_51553_.rotate(p_51552_.getValue(FACING)));
+    }
+
+    public BlockState mirror(BlockState p_51549_, Mirror p_51550_) {
+        BlockState rotated = p_51549_.rotate(p_51550_.getRotation(p_51549_.getValue(FACING)));
+        return p_51550_ == Mirror.NONE ? rotated : rotated.setValue(TYPE, rotated.getValue(TYPE).getOpposite());  // Forge: Fixed MC-134110 Structure mirroring breaking apart double chests
+    }
+
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_51562_) {
+        p_51562_.add(FACING, TYPE, WATERLOGGED);
+    }
+
+    public boolean isPathfindable(BlockState p_51522_, BlockGetter p_51523_, BlockPos p_51524_, PathComputationType p_51525_) {
+        return false;
+    }
+
+    public void tick(BlockState p_220958_, ServerLevel p_220959_, BlockPos p_220960_, RandomSource p_220961_) {
+        BlockEntity blockentity = p_220959_.getBlockEntity(p_220960_);
+        if (blockentity instanceof ChestTE) {
+            ((ChestTE) blockentity).recheckOpen();
+        }
+
+    }
 }

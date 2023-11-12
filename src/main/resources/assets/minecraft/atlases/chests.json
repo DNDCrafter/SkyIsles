@@ -1,0 +1,9 @@
+{
+  "sources": [
+    {
+      "type": "directory",
+      "source": "skyisles:entity/chest",
+      "prefix": "skyisles:entity/chest/"
+    }
+  ]
+}

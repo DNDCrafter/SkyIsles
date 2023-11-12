@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "skyisles:block/block_entity"
+    }
+  }
+}
