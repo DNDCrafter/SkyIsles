@@ -1,5 +1,19 @@
 {
     "variants": {
-        "": { "model": "skyisles:block/drawer_block" }
+        "facing=east": {
+            "model": "skyisles:block/drawer_block",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "skyisles:block/drawer_block"
+        },
+        "facing=south": {
+            "model": "skyisles:block/drawer_block",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "skyisles:block/drawer_block",
+            "y": 270
+        }
     }
 }

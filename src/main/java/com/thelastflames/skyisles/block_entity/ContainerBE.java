@@ -50,8 +50,7 @@ public class ContainerBE extends BlockEntity {
         return inventories[inventory].open(container, playerInv, pPlayer);
     }
 
-    @Override
-    public void setRemoved() {
+    public void removed() {
         for (ContainerInventory inventory : inventories) {
             Containers.dropContents(level, worldPosition, inventory);
         }

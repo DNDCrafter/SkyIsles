@@ -3,6 +3,7 @@ package com.thelastflames.skyisles;
 import com.thelastflames.skyisles.client.block.ChestTESR;
 import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -22,7 +23,6 @@ public class ClientSetup {
 	}
 	
 	public static void registerTERS(EntityRenderersEvent.RegisterRenderers event) {
-//		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.MULTIMATERIALTE.get(), MultiMaterialTERenderer::new);
 //		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.LAMPTE.get(), MultiMaterialTERenderer::new);
 //		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.SKYBOX.get(), SkyboxRenderer::new);
 //		ClientRegistry.bindTileEntityRenderer(SkyTileEntities.ITEM_OBSERVER.get(), ItemObserverRenderer::new);
@@ -31,7 +31,7 @@ public class ClientSetup {
 	
 	public static void setupRenderLayers() {
 //		RenderTypeLookup.setRenderLayer(SkyBlocks.LAMP_BLOCK.getObject1().get(), RenderType.getCutout());
-//		RenderTypeLookup.setRenderLayer(SkyBlocks.DRAWER_BLOCK.getObject1().get(), RenderType.getCutout());
+		ItemBlockRenderTypes.setRenderLayer(SkyBlocks.DRAWER_BLOCK.getObject1().get(), RenderType.cutout());
 //		RenderTypeLookup.setRenderLayer(SkyBlocks.ITEM_OBSERVER.getObject1().get(), RenderType.getCutout());
 	}
 	
