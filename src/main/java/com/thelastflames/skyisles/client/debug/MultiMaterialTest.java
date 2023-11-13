@@ -147,6 +147,7 @@ public class MultiMaterialTest {
     }
 
     protected static void drawBlock(
+            MultiMatModel model,
             Minecraft mc, PoseStack stk, MultiBufferSource.BufferSource src,
             BlockPos coord,
             ResourceLocation base, ResourceLocation blend,
@@ -156,32 +157,17 @@ public class MultiMaterialTest {
         stk.pushPose();
         stk.translate(coord.getX(), coord.getY(), coord.getZ());
 
-        BlockState state = Blocks.BLUE_ICE.defaultBlockState();
-
-        BakedModel mdl = mc.getBlockRenderer().getBlockModel(state);
-
-        MultiMatModel mmdl = new MultiMatModel();
         VertexConsumer consumer = src.getBuffer(RenderType.solid());
         for (Direction value : Direction.values()) {
-            for (BakedQuad quad : mdl.getQuads(state, value, new LegacyRandomSource(0), ModelData.EMPTY, RenderType.solid())) {
-                List<Pair<Boolean, BakedQuad>> quads = mmdl.bake(
-                        mc,
-                        quad,
-                        base, blend,
-                        Pair.of(frame, frameShape)
+            for (BakedQuad quad : model.getBase(mc, value, base, frame)) {
+                float shade = mc.level.getShade(
+                        quad.getDirection(), quad.isShade()
                 );
-                for (Pair<Boolean, BakedQuad> rebake : quads) {
-                    if (!rebake.getFirst()) {
-                        float shade = mc.level.getShade(
-                                quad.getDirection(), quad.isShade()
-                        );
-                        consumer.putBulkData(
-                                stk.last(), rebake.getSecond(),
-                                shade, shade, shade,
-                                fullbright ? LightTexture.FULL_BRIGHT : LightTexture.FULL_SKY, OverlayTexture.NO_OVERLAY
-                        );
-                    }
-                }
+                consumer.putBulkData(
+                        stk.last(), quad,
+                        shade, shade, shade,
+                        fullbright ? LightTexture.FULL_BRIGHT : LightTexture.FULL_SKY, OverlayTexture.NO_OVERLAY
+                );
             }
         }
 
@@ -203,22 +189,12 @@ public class MultiMaterialTest {
         builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
 
         for (Direction value : Direction.values()) {
-            for (BakedQuad quad : mdl.getQuads(state, value, new LegacyRandomSource(0), ModelData.EMPTY, RenderType.solid())) {
-                List<Pair<Boolean, BakedQuad>> quads = mmdl.bake(
-                        mc,
-                        quad,
-                        base, blend,
-                        Pair.of(frame, frameShape)
+            for (BakedQuad quad : model.getOverlay(mc, value, blend, frameShape)) {
+                builder.putBulkData(
+                        stk.last(), quad,
+                        1, 1, 1,
+                        LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
                 );
-                for (Pair<Boolean, BakedQuad> rebake : quads) {
-                    if (rebake.getFirst()) {
-                        builder.putBulkData(
-                                stk.last(), rebake.getSecond(),
-                                1, 1, 1,
-                                LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
-                        );
-                    }
-                }
             }
         }
 
@@ -252,7 +228,7 @@ public class MultiMaterialTest {
                 "cobblestone"
         };
 
-        String[] lamps = new String[] {
+        String[] lamps = new String[]{
                 "blue_ice",
                 "sea_lantern",
                 "redstone_block",
@@ -260,10 +236,15 @@ public class MultiMaterialTest {
                 "sculk"
         };
 
+        BlockState state = Blocks.BLUE_ICE.defaultBlockState();
+
+        BakedModel mdl = mc.getBlockRenderer().getBlockModel(state);
+        MultiMatModel mmdl = new MultiMatModel(mc, mdl, new ResourceLocation("skyisles:block/lamp_base"), new ResourceLocation("skyisles:block/lamp_overlay"));
+
         for (int i = 0; i < lamps.length; i++) {
             for (int i1 = 0; i1 < bases.length; i1++) {
                 drawBlock(
-                        mc, stk, src, new BlockPos(i1, 0,  i * 3),
+                        mmdl, mc, stk, src, new BlockPos(i1, 0, i * 3),
                         new ResourceLocation("minecraft:block/" + lamps[i]),
                         new ResourceLocation("skyisles:block/lamp_base"),
                         new ResourceLocation("minecraft:block/" + bases[i1]),
@@ -271,7 +252,7 @@ public class MultiMaterialTest {
                         false
                 );
                 drawBlock(
-                        mc, stk, src, new BlockPos(i1, 0, 1 + i * 3),
+                        mmdl, mc, stk, src, new BlockPos(i1, 0, 1 + i * 3),
                         new ResourceLocation("minecraft:block/" + lamps[i]),
                         new ResourceLocation("skyisles:block/lamp_base_on"),
                         new ResourceLocation("minecraft:block/" + bases[i1]),

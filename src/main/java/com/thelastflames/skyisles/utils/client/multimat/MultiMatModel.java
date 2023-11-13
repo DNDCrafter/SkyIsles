@@ -3,16 +3,23 @@ package com.thelastflames.skyisles.utils.client.multimat;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.model.data.ModelData;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class MultiMatModel {
@@ -20,23 +27,18 @@ public class MultiMatModel {
             int[] verts,
             float[] newTex
     ) {
-        ByteBuffer buffer = ByteBuffer.allocate(DefaultVertexFormat.BLOCK.getVertexSize() * 4);
-        for (int i = 0; i < verts.length; i++)
-            buffer.putInt(i * 4, verts[i]);
-        //@formatter:off
-        buffer.putFloat(16     , newTex[0]);
-        buffer.putFloat(20     , newTex[1]);
-        buffer.putFloat(16 + 32, newTex[2]);
-        buffer.putFloat(20 + 32, newTex[3]);
-        buffer.putFloat(16 + 64, newTex[4]);
-        buffer.putFloat(20 + 64, newTex[5]);
-        buffer.putFloat(16 + 96, newTex[6]);
-        buffer.putFloat(20 + 96, newTex[7]);
-        //@formatter:on
+        int[] cpy = Arrays.copyOf(verts, verts.length);
 
-        int[] cpy = new int[verts.length];
-        for (int i = 0; i < cpy.length; i++)
-            cpy[i] = buffer.getInt(i * 4);
+        //@formatter:off
+        cpy[(16     ) / 4] = Float.floatToRawIntBits(newTex[0]);
+        cpy[(20     ) / 4] = Float.floatToRawIntBits(newTex[1]);
+        cpy[(16 + 32) / 4] = Float.floatToRawIntBits(newTex[2]);
+        cpy[(20 + 32) / 4] = Float.floatToRawIntBits(newTex[3]);
+        cpy[(16 + 64) / 4] = Float.floatToRawIntBits(newTex[4]);
+        cpy[(20 + 64) / 4] = Float.floatToRawIntBits(newTex[5]);
+        cpy[(16 + 96) / 4] = Float.floatToRawIntBits(newTex[6]);
+        cpy[(20 + 96) / 4] = Float.floatToRawIntBits(newTex[7]);
+        //@formatter:on
 
         return cpy;
     }
@@ -44,18 +46,14 @@ public class MultiMatModel {
     float[] texCoords(int[] data) {
         float[] coords = new float[8];
 
-        ByteBuffer buffer = ByteBuffer.allocate(DefaultVertexFormat.BLOCK.getVertexSize() * 4);
-        for (int i = 0; i < data.length; i++)
-            buffer.putInt(i * 4, data[i]);
-
-        coords[0] = buffer.getFloat(16);
-        coords[1] = buffer.getFloat(20);
-        coords[2] = buffer.getFloat(16 + 32);
-        coords[3] = buffer.getFloat(20 + 32);
-        coords[4] = buffer.getFloat(16 + 64);
-        coords[5] = buffer.getFloat(20 + 64);
-        coords[6] = buffer.getFloat(16 + 96);
-        coords[7] = buffer.getFloat(20 + 96);
+        coords[0] = Float.intBitsToFloat(data[(16 + 0) / 4]);
+        coords[1] = Float.intBitsToFloat(data[(20 + 0) / 4]);
+        coords[2] = Float.intBitsToFloat(data[(16 + 32) / 4]);
+        coords[3] = Float.intBitsToFloat(data[(20 + 32) / 4]);
+        coords[4] = Float.intBitsToFloat(data[(16 + 64) / 4]);
+        coords[5] = Float.intBitsToFloat(data[(20 + 64) / 4]);
+        coords[6] = Float.intBitsToFloat(data[(16 + 96) / 4]);
+        coords[7] = Float.intBitsToFloat(data[(20 + 96) / 4]);
 
         return coords;
     }
@@ -110,7 +108,7 @@ public class MultiMatModel {
         return res;
     }
 
-    int[] interpQd(int layer, Direction dir, int[] vertices, float w, float h, float x, float y) {
+    int[] interpQd(int layer, Direction dir, int[] vertices, float w, float h, float minX, float maxX, float y) {
         // TODO: calculate a normal vector for quads where a direction is not defined
         layer++;
         float[] nrm = new float[]{
@@ -119,12 +117,13 @@ public class MultiMatModel {
                 dir.getStepZ() * (1 / 800f) * layer,
         };
 
-        x /= w;
+        minX /= w;
+        maxX /= w;
         y /= h;
-        float[] v00 = interp(nrm, vertices, x, y);
-        float[] v01 = interp(nrm, vertices, x, y + 1 / h);
-        float[] v11 = interp(nrm, vertices, x + 1 / w, y + 1 / h);
-        float[] v10 = interp(nrm, vertices, x + 1 / w, y);
+        float[] v00 = interp(nrm, vertices, minX, y);
+        float[] v01 = interp(nrm, vertices, minX, y + 1 / h);
+        float[] v11 = interp(nrm, vertices, maxX, y + 1 / h);
+        float[] v10 = interp(nrm, vertices, maxX, y);
         vertices[0] = Float.floatToRawIntBits(v00[0]);
         vertices[1] = Float.floatToRawIntBits(v00[1]);
         vertices[2] = Float.floatToRawIntBits(v00[2]);
@@ -140,7 +139,47 @@ public class MultiMatModel {
         return vertices;
     }
 
-    public List<Pair<Boolean, BakedQuad>> bake(
+    BakedModel srcModel;
+    HashMap<Direction, List<Pair<Integer, BakedQuad>>> quadsBase = new HashMap<>();
+    HashMap<Direction, List<Pair<Integer, BakedQuad>>> quadsOverlay = new HashMap<>();
+
+    public MultiMatModel(
+            Minecraft mc,
+            BakedModel srcModel,
+            ResourceLocation... layers
+    ) {
+        this.srcModel = srcModel;
+
+        for (Direction value : Direction.values()) {
+            quadsBase.put(value, new ArrayList<>());
+            quadsOverlay.put(value, new ArrayList<>());
+
+            for (BakedQuad quad : srcModel.getQuads(
+                    Blocks.STONE.defaultBlockState(),
+                    value, new LegacyRandomSource(0),
+                    ModelData.EMPTY, RenderType.solid()
+            )) {
+                Pair<ResourceLocation, ResourceLocation>[] olays = new Pair[layers.length - 1];
+                for (int i = 0; i < olays.length; i++) {
+                    olays[i] = Pair.of(new ResourceLocation("minecraft:block/stone"), layers[i + 1]);
+                }
+
+                List<Triplet<Integer, Boolean, BakedQuad>> qds = bake(
+                        mc, quad,
+                        new ResourceLocation("minecraft:block/stone"),
+                        layers[0],
+                        olays
+                );
+
+                for (Triplet<Integer, Boolean, BakedQuad> qd : qds) {
+                    if (qd.getSecond()) quadsOverlay.get(value).add(Pair.of(qd.getFirst(), qd.getThird()));
+                    else quadsBase.get(value).add(Pair.of(qd.getFirst(), qd.getThird()));
+                }
+            }
+        }
+    }
+
+    protected List<Triplet<Integer, Boolean, BakedQuad>> bake(
             Minecraft mc,
 
             BakedQuad originalQuad,
@@ -162,14 +201,14 @@ public class MultiMatModel {
             srcCoords[i + 1] /= (sprite.getV(1) - sprite.getV(0));
         }
 
-        ArrayList<Pair<Boolean, BakedQuad>> quads = new ArrayList<>();
+        ArrayList<Triplet<Integer, Boolean, BakedQuad>> quads = new ArrayList<>();
 
         sprite = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(base);
         float[] newTex = new float[8];
         mapTex(srcCoords, newTex, sprite);
-        quads.add(Pair.of(
-                false, new BakedQuad(
-                        changeTextures(originalQuad.getVertices(), newTex),
+        quads.add(Triplet.of(
+                0, false, new BakedQuad(
+                        originalQuad.getVertices(),
                         originalQuad.getTintIndex(), originalQuad.getDirection(),
                         originalQuad.getSprite(), originalQuad.isShade(),
                         originalQuad.hasAmbientOcclusion()
@@ -179,12 +218,12 @@ public class MultiMatModel {
         sprite = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(blend);
         newTex = new float[8];
         mapTex(srcCoords, newTex, sprite);
-        quads.add(Pair.of(
-                true, new BakedQuad(
+        quads.add(Triplet.of(
+                0, true, new BakedQuad(
                         changeTextures(originalQuad.getVertices(), newTex),
-                        originalQuad.getTintIndex(), originalQuad.getDirection(),
-                        originalQuad.getSprite(), originalQuad.isShade(),
-                        originalQuad.hasAmbientOcclusion()
+                        0, originalQuad.getDirection(),
+                        sprite, false,
+                        false
                 )
         ));
 
@@ -193,23 +232,38 @@ public class MultiMatModel {
 
             TextureAtlasSprite sprite1 = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(olay.getFirst());
             TextureAtlasSprite sprite2 = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(olay.getSecond());
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
+            for (int y = 0; y < h; y++) {
+                for (int x = 0; x < w; x++) {
                     int rgba = sprite2.getPixelRGBA(0, x, y);
                     int a = (rgba >> 24) & 0xFF;
+
                     if (a != 0) {
+                        // find row length
+                        int minX = x;
+                        while (a != 0) {
+                            x++;
+                            if (x == w) {
+                                break;
+                            }
+                            rgba = sprite2.getPixelRGBA(0, x, y);
+                            a = (rgba >> 24) & 0xFF;
+                        }
+                        int maxX = x;
+                        x--;
+
                         float[] from = new float[]{
-                                x, y,
-                                x, y + 1,
-                                x + 1, y + 1,
-                                x + 1, y
+                                minX, y,
+                                minX, y + 1,
+                                maxX, y + 1,
+                                maxX, y
                         };
                         mapTex(from, newTex, sprite1);
                         quads.add(
-                                Pair.of(
+                                Triplet.of(
+                                        i + 1,
                                         false,
                                         new BakedQuad(
-                                                interpQd(i, originalQuad.getDirection(), changeTextures(originalQuad.getVertices(), newTex), w, h, x, y),
+                                                interpQd(i, originalQuad.getDirection(), changeTextures(originalQuad.getVertices(), newTex), w, h, minX, maxX, y),
                                                 0, originalQuad.getDirection(),
                                                 sprite1, originalQuad.isShade(),
                                                 originalQuad.hasAmbientOcclusion()
@@ -218,17 +272,18 @@ public class MultiMatModel {
                         );
 
                         from = new float[]{
-                                x, y,
-                                x, y + 1,
-                                x + 1, y + 1,
-                                x + 1, y
+                                minX, y,
+                                minX, y + 1,
+                                maxX, y + 1,
+                                maxX, y
                         };
                         mapTex(from, newTex, sprite2);
                         quads.add(
-                                Pair.of(
+                                Triplet.of(
+                                        i + 1,
                                         true,
                                         new BakedQuad(
-                                                interpQd(i, originalQuad.getDirection(), changeTextures(originalQuad.getVertices(), newTex), w, h, x, y),
+                                                interpQd(i, originalQuad.getDirection(), changeTextures(originalQuad.getVertices(), newTex), w, h, minX, maxX, y),
                                                 0, originalQuad.getDirection(),
                                                 sprite2, false,
                                                 false
@@ -238,6 +293,95 @@ public class MultiMatModel {
                     }
                 }
             }
+        }
+
+        return quads;
+    }
+
+    public List<BakedQuad> getBase(Minecraft mc, Direction value, ResourceLocation base, ResourceLocation... layers) {
+        List<Pair<Integer, BakedQuad>> quadsIn = quadsBase.get(value);
+        List<BakedQuad> quads = new ArrayList<>();
+        float[] newTex = new float[8];
+
+        TextureAtlasSprite[] sprites = new TextureAtlasSprite[layers.length + 1];
+        for (int i = 0; i < layers.length; i++)
+            sprites[i + 1] = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(layers[i]);
+        sprites[0] = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(base);
+
+        for (Pair<Integer, BakedQuad> quadD : quadsIn) {
+            int layer = quadD.getFirst();
+            BakedQuad quad = quadD.getSecond();
+
+            TextureAtlasSprite sprite = quad.getSprite();
+
+            float[] srcCoords = texCoords(quad.getVertices());
+
+            for (int i = 0; i < srcCoords.length; i += 2) {
+                srcCoords[i] -= sprite.getU(0);
+                srcCoords[i + 1] -= sprite.getV(0);
+                srcCoords[i] /= (sprite.getU(1) - sprite.getU(0));
+                srcCoords[i + 1] /= (sprite.getV(1) - sprite.getV(0));
+            }
+
+            sprite = sprites[layer];
+
+            mapTex(srcCoords, newTex, sprite);
+
+            quads.add(new BakedQuad(
+                    changeTextures(Arrays.copyOf(quad.getVertices(), quad.getVertices().length), newTex),
+                    quad.getTintIndex(), quad.getDirection(),
+                    sprite, quad.isShade(),
+                    quad.hasAmbientOcclusion()
+            ));
+        }
+
+        return quads;
+    }
+
+    public List<BakedQuad> getOverlay(Minecraft mc, Direction value, ResourceLocation base, ResourceLocation... layers) {
+        List<Pair<Integer, BakedQuad>> quadsIn = quadsOverlay.get(value);
+        List<BakedQuad> quads = new ArrayList<>();
+        float[] newTex = new float[8];
+
+        TextureAtlasSprite[] sprites = new TextureAtlasSprite[layers.length + 1];
+        for (int i = 0; i < layers.length; i++)
+            sprites[i + 1] = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(layers[i]);
+        sprites[0] = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(base);
+
+        for (Pair<Integer, BakedQuad> quadD : quadsIn) {
+            int layer = quadD.getFirst();
+            BakedQuad quad = quadD.getSecond();
+
+            TextureAtlasSprite sprite = quad.getSprite();
+
+            float[] srcCoords = texCoords(quad.getVertices());
+
+            ResourceLocation mapTo;
+            if (layer == 0)
+                mapTo = base;
+            else mapTo = layers[layer - 1];
+
+            if (mapTo.equals(sprite.contents().name())) {
+                quads.add(quad);
+                continue;
+            }
+
+            for (int i = 0; i < srcCoords.length; i += 2) {
+                srcCoords[i] -= sprite.getU(0);
+                srcCoords[i + 1] -= sprite.getV(0);
+                srcCoords[i] /= (sprite.getU(1) - sprite.getU(0));
+                srcCoords[i + 1] /= (sprite.getV(1) - sprite.getV(0));
+            }
+
+            sprite = sprites[layer];
+
+            mapTex(srcCoords, newTex, sprite);
+
+            quads.add(new BakedQuad(
+                    changeTextures(Arrays.copyOf(quad.getVertices(), quad.getVertices().length), newTex),
+                    0, quad.getDirection(),
+                    sprite, false, false
+            ));
         }
 
         return quads;
