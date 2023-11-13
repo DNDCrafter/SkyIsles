@@ -24,7 +24,7 @@ public class DefaultNBTBlockItem extends BlockItem {
     @Override
     public void inventoryTick(ItemStack stack, Level p_41405_, Entity p_41406_, int p_41407_, boolean p_41408_) {
 		if (!stack.hasTag()) {
-			stack.setTag(defaultNBT);
+			stack.setTag(defaultNBT.copy());
 		}
         super.inventoryTick(stack, p_41405_, p_41406_, p_41407_, p_41408_);
 	}

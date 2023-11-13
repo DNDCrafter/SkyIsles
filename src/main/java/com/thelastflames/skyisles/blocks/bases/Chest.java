@@ -1,10 +1,9 @@
 package com.thelastflames.skyisles.blocks.bases;
 
-import com.thelastflames.skyisles.tile_entity.ChestTE;
+import com.thelastflames.skyisles.block_entity.ChestTE;
 import it.unimi.dsi.fastutil.floats.Float2FloatFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;

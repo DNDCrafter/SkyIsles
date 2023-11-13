@@ -25,7 +25,7 @@ public class SkyBlocks {
 
 //	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:iron_ingot;minecraft:gold_ingot").Package())));
 //	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", new LampBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:glowstone;minecraft:black_concrete").Package())));
-//	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", new DrawerBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:spruce_wood;minecraft:iron_block").Package())));
+    public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", DrawerBlock::new, 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 //	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> SKYBOX_BLOCK = registerBlockWithItem("skybox_test", new SkyIslesSkyboxBlock(Block.Properties.from(Blocks.COBBLESTONE),
 //			new ResourceLocation("skyisles:textures/block/skybox.png"),
 //			new ResourceLocation("skyisles:textures/block/skybox_pass.png"),

@@ -1,7 +1,7 @@
 package com.thelastflames.skyisles.blocks;
 
 import com.thelastflames.skyisles.blocks.bases.Chest;
-import com.thelastflames.skyisles.tile_entity.ChestTE;
+import com.thelastflames.skyisles.block_entity.ChestTE;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.StringRepresentable;

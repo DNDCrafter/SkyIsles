@@ -1,4 +1,4 @@
-package com.thelastflames.skyisles.tile_entity;
+package com.thelastflames.skyisles.block_entity;
 
 import com.thelastflames.skyisles.registry.SkyTileEntities;
 import net.minecraft.core.BlockPos;
@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 //literally just a copy of vanilla
 public class ChestTE extends RandomizableContainerBlockEntity implements LidBlockEntity {
