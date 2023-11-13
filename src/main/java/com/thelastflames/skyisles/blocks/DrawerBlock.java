@@ -2,9 +2,7 @@ package com.thelastflames.skyisles.blocks;
 
 import com.thelastflames.skyisles.block_entity.ContainerBE;
 import com.thelastflames.skyisles.block_entity.inventory.ContainerInventory;
-import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
-import com.thelastflames.skyisles.utils.StringyHashMap;
 import com.thelastflames.skyisles.utils.shape.ShapeRotator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -20,7 +18,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -31,8 +28,6 @@ import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
-
-import javax.annotation.Nonnull;
 
 public class DrawerBlock extends Block implements EntityBlock {
     public DrawerBlock() {

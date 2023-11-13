@@ -24,6 +24,11 @@ import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.ChestType;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.InvWrapper;
 
 //literally just a copy of vanilla
 public class ChestTE extends RandomizableContainerBlockEntity implements LidBlockEntity {
@@ -69,19 +74,19 @@ public class ChestTE extends RandomizableContainerBlockEntity implements LidBloc
         return Component.translatable("container.chest");
     }
 
-    public void load(CompoundTag p_155349_) {
-        super.load(p_155349_);
+    public void load(CompoundTag tag) {
+        super.load(tag);
         this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-        if (!this.tryLoadLootTable(p_155349_)) {
-            ContainerHelper.loadAllItems(p_155349_, this.items);
+        if (!this.tryLoadLootTable(tag)) {
+            ContainerHelper.loadAllItems(tag, this.items);
         }
 
     }
 
-    protected void saveAdditional(CompoundTag p_187489_) {
-        super.saveAdditional(p_187489_);
-        if (!this.trySaveLootTable(p_187489_)) {
-            ContainerHelper.saveAllItems(p_187489_, this.items);
+    protected void saveAdditional(CompoundTag tag) {
+        super.saveAdditional(tag);
+        if (!this.trySaveLootTable(tag)) {
+            ContainerHelper.saveAllItems(tag, this.items);
         }
 
     }
@@ -90,41 +95,41 @@ public class ChestTE extends RandomizableContainerBlockEntity implements LidBloc
         p_155347_.chestLidController.tickLid();
     }
 
-    static void playSound(Level p_155339_, BlockPos p_155340_, BlockState p_155341_, SoundEvent p_155342_) {
-        ChestType chesttype = p_155341_.getValue(ChestBlock.TYPE);
+    static void playSound(Level level, BlockPos pos, BlockState state, SoundEvent event) {
+        ChestType chesttype = state.getValue(ChestBlock.TYPE);
         if (chesttype != ChestType.LEFT) {
-            double d0 = (double) p_155340_.getX() + 0.5D;
-            double d1 = (double) p_155340_.getY() + 0.5D;
-            double d2 = (double) p_155340_.getZ() + 0.5D;
+            double d0 = (double) pos.getX() + 0.5D;
+            double d1 = (double) pos.getY() + 0.5D;
+            double d2 = (double) pos.getZ() + 0.5D;
             if (chesttype == ChestType.RIGHT) {
-                Direction direction = ChestBlock.getConnectedDirection(p_155341_);
+                Direction direction = ChestBlock.getConnectedDirection(state);
                 d0 += (double) direction.getStepX() * 0.5D;
                 d2 += (double) direction.getStepZ() * 0.5D;
             }
 
-            p_155339_.playSound((Player) null, d0, d1, d2, p_155342_, SoundSource.BLOCKS, 0.5F, p_155339_.random.nextFloat() * 0.1F + 0.9F);
+            level.playSound(null, d0, d1, d2, event, SoundSource.BLOCKS, 0.5F, level.random.nextFloat() * 0.1F + 0.9F);
         }
     }
 
-    public boolean triggerEvent(int p_59114_, int p_59115_) {
-        if (p_59114_ == 1) {
-            this.chestLidController.shouldBeOpen(p_59115_ > 0);
+    public boolean triggerEvent(int event, int data) {
+        if (event == EVENT_SET_OPEN_COUNT) {
+            this.chestLidController.shouldBeOpen(data > 0);
             return true;
         } else {
-            return super.triggerEvent(p_59114_, p_59115_);
+            return super.triggerEvent(event, data);
         }
     }
 
-    public void startOpen(Player p_59120_) {
-        if (!this.remove && !p_59120_.isSpectator()) {
-            this.openersCounter.incrementOpeners(p_59120_, this.getLevel(), this.getBlockPos(), this.getBlockState());
+    public void startOpen(Player player) {
+        if (!this.remove && !player.isSpectator()) {
+            this.openersCounter.incrementOpeners(player, this.getLevel(), this.getBlockPos(), this.getBlockState());
         }
 
     }
 
-    public void stopOpen(Player p_59118_) {
-        if (!this.remove && !p_59118_.isSpectator()) {
-            this.openersCounter.decrementOpeners(p_59118_, this.getLevel(), this.getBlockPos(), this.getBlockState());
+    public void stopOpen(Player player) {
+        if (!this.remove && !player.isSpectator()) {
+            this.openersCounter.decrementOpeners(player, this.getLevel(), this.getBlockPos(), this.getBlockState());
         }
 
     }
@@ -133,18 +138,18 @@ public class ChestTE extends RandomizableContainerBlockEntity implements LidBloc
         return this.items;
     }
 
-    protected void setItems(NonNullList<ItemStack> p_59110_) {
-        this.items = p_59110_;
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
     }
 
-    public float getOpenNess(float p_59080_) {
-        return this.chestLidController.getOpenness(p_59080_);
+    public float getOpenNess(float pct) {
+        return this.chestLidController.getOpenness(pct);
     }
 
-    public static int getOpenCount(BlockGetter p_59087_, BlockPos p_59088_) {
-        BlockState blockstate = p_59087_.getBlockState(p_59088_);
+    public static int getOpenCount(BlockGetter world, BlockPos pos) {
+        BlockState blockstate = world.getBlockState(pos);
         if (blockstate.hasBlockEntity()) {
-            BlockEntity blockentity = p_59087_.getBlockEntity(p_59088_);
+            BlockEntity blockentity = world.getBlockEntity(pos);
             if (blockentity instanceof ChestTE) {
                 return ((ChestTE) blockentity).openersCounter.getOpenerCount();
             }
@@ -153,45 +158,45 @@ public class ChestTE extends RandomizableContainerBlockEntity implements LidBloc
         return 0;
     }
 
-    public static void swapContents(ChestTE p_59104_, ChestTE p_59105_) {
-        NonNullList<ItemStack> nonnulllist = p_59104_.getItems();
-        p_59104_.setItems(p_59105_.getItems());
-        p_59105_.setItems(nonnulllist);
+    public static void swapContents(ChestTE chest0, ChestTE chest1) {
+        NonNullList<ItemStack> nonnulllist = chest0.getItems();
+        chest0.setItems(chest1.getItems());
+        chest1.setItems(nonnulllist);
     }
 
     protected AbstractContainerMenu createMenu(int p_59082_, Inventory p_59083_) {
         return ChestMenu.threeRows(p_59082_, p_59083_, this);
     }
 
-    private net.minecraftforge.common.util.LazyOptional<net.minecraftforge.items.IItemHandlerModifiable> chestHandler;
+    private LazyOptional<IItemHandlerModifiable> chestHandler;
 
     @Override
-    public void setBlockState(BlockState p_155251_) {
-        super.setBlockState(p_155251_);
+    public void setBlockState(BlockState state) {
+        super.setBlockState(state);
         if (this.chestHandler != null) {
-            net.minecraftforge.common.util.LazyOptional<?> oldHandler = this.chestHandler;
+            LazyOptional<?> oldHandler = this.chestHandler;
             this.chestHandler = null;
             oldHandler.invalidate();
         }
     }
 
     @Override
-    public <T> net.minecraftforge.common.util.LazyOptional<T> getCapability(net.minecraftforge.common.capabilities.Capability<T> cap, Direction side) {
-        if (!this.remove && cap == net.minecraftforge.common.capabilities.ForgeCapabilities.ITEM_HANDLER) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+        if (!this.remove && cap == ForgeCapabilities.ITEM_HANDLER) {
             if (this.chestHandler == null)
-                this.chestHandler = net.minecraftforge.common.util.LazyOptional.of(this::createHandler);
+                this.chestHandler = LazyOptional.of(this::createHandler);
             return this.chestHandler.cast();
         }
         return super.getCapability(cap, side);
     }
 
-    private net.minecraftforge.items.IItemHandlerModifiable createHandler() {
+    private IItemHandlerModifiable createHandler() {
         BlockState state = this.getBlockState();
         if (!(state.getBlock() instanceof ChestBlock)) {
-            return new net.minecraftforge.items.wrapper.InvWrapper(this);
+            return new InvWrapper(this);
         }
         Container inv = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, getLevel(), getBlockPos(), true);
-        return new net.minecraftforge.items.wrapper.InvWrapper(inv == null ? this : inv);
+        return new InvWrapper(inv == null ? this : inv);
     }
 
     @Override
@@ -210,8 +215,8 @@ public class ChestTE extends RandomizableContainerBlockEntity implements LidBloc
 
     }
 
-    protected void signalOpenCount(Level p_155333_, BlockPos p_155334_, BlockState p_155335_, int p_155336_, int p_155337_) {
-        Block block = p_155335_.getBlock();
-        p_155333_.blockEvent(p_155334_, block, 1, p_155337_);
+    protected void signalOpenCount(Level level, BlockPos pos, BlockState state, int p_155336_, int count) {
+        Block block = state.getBlock();
+        level.blockEvent(pos, block, EVENT_SET_OPEN_COUNT, count);
     }
 }

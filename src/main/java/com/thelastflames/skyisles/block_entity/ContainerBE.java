@@ -10,6 +10,7 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,18 +33,27 @@ public class ContainerBE extends BlockEntity {
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
-        ListTag inventories = new ListTag();
-        for (ContainerInventory inventory : this.inventories)
-            inventories.add(inventory.serialize());
-        pTag.put("Inventories", inventories);
+        if (inventories.length == 1) {
+            ContainerInventory inventory = inventories[0];
+            pTag.put("Items", inventory.serialize());
+        } else {
+            ListTag inventories = new ListTag();
+            for (ContainerInventory inventory : this.inventories)
+                inventories.add(inventory.serialize());
+            pTag.put("Inventories", inventories);
+        }
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        ListTag tag = pTag.getList("Inventories", CompoundTag.TAG_LIST);
-        for (int i = 0; i < tag.size(); i++)
-            inventories[i].load((ListTag) tag.get(i));
+        if (inventories.length == 1) {
+            inventories[0].load(pTag.getList("Items", Tag.TAG_COMPOUND));
+        } else {
+            ListTag tag = pTag.getList("Inventories", CompoundTag.TAG_LIST);
+            for (int i = 0; i < tag.size(); i++)
+                inventories[i].load((ListTag) tag.get(i));
+        }
     }
 
     public AbstractContainerMenu openGui(int container, Inventory playerInv, int inventory, Player pPlayer) {
