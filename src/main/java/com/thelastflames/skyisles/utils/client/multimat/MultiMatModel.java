@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 
 public class MultiMatModel {
     int[] changeTextures(
@@ -143,11 +144,23 @@ public class MultiMatModel {
     HashMap<Direction, List<Pair<Integer, BakedQuad>>> quadsBase = new HashMap<>();
     HashMap<Direction, List<Pair<Integer, BakedQuad>>> quadsOverlay = new HashMap<>();
 
+    private Function<ResourceLocation, TextureAtlasSprite> spriteLookup;
+
     public MultiMatModel(
             Minecraft mc,
             BakedModel srcModel,
             ResourceLocation... layers
     ) {
+        this(mc, srcModel, (res) -> mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(res), layers);
+    }
+
+    public MultiMatModel(
+            Minecraft mc,
+            BakedModel srcModel,
+            Function<ResourceLocation, TextureAtlasSprite> spriteLookup,
+            ResourceLocation... layers
+    ) {
+        this.spriteLookup = spriteLookup;
         this.srcModel = srcModel;
 
         for (Direction value : Direction.values()) {
@@ -203,7 +216,7 @@ public class MultiMatModel {
 
         ArrayList<Triplet<Integer, Boolean, BakedQuad>> quads = new ArrayList<>();
 
-        sprite = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(base);
+        sprite = spriteLookup.apply(base);
         float[] newTex = new float[8];
         mapTex(srcCoords, newTex, sprite);
         quads.add(Triplet.of(
@@ -215,7 +228,7 @@ public class MultiMatModel {
                 )
         ));
 
-        sprite = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(blend);
+        sprite = spriteLookup.apply(blend);
         newTex = new float[8];
         mapTex(srcCoords, newTex, sprite);
         quads.add(Triplet.of(
@@ -230,8 +243,8 @@ public class MultiMatModel {
         for (int i = 0; i < overlays.length; i++) {
             Pair<ResourceLocation, ResourceLocation> olay = overlays[i];
 
-            TextureAtlasSprite sprite1 = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(olay.getFirst());
-            TextureAtlasSprite sprite2 = mc.getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(olay.getSecond());
+            TextureAtlasSprite sprite1 = spriteLookup.apply(olay.getFirst());
+            TextureAtlasSprite sprite2 = spriteLookup.apply(olay.getSecond());
             for (int y = 0; y < h; y++) {
                 for (int x = 0; x < w; x++) {
                     int rgba = sprite2.getPixelRGBA(0, x, y);
@@ -300,6 +313,8 @@ public class MultiMatModel {
 
     public List<BakedQuad> getBase(Minecraft mc, Direction value, ResourceLocation base, ResourceLocation... layers) {
         List<Pair<Integer, BakedQuad>> quadsIn = quadsBase.get(value);
+        if (quadsIn == null) return List.of();
+
         List<BakedQuad> quads = new ArrayList<>();
         float[] newTex = new float[8];
 
@@ -340,6 +355,8 @@ public class MultiMatModel {
 
     public List<BakedQuad> getOverlay(Minecraft mc, Direction value, ResourceLocation base, ResourceLocation... layers) {
         List<Pair<Integer, BakedQuad>> quadsIn = quadsOverlay.get(value);
+        if (quadsIn == null) return List.of();
+
         List<BakedQuad> quads = new ArrayList<>();
         float[] newTex = new float[8];
 

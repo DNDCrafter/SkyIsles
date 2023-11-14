@@ -211,6 +211,8 @@ public class MultiMaterialTest {
     }
 
     public static void draw(Minecraft mc, Camera camera, PoseStack stk, MultiBufferSource.BufferSource src) {
+        if (true) return;
+
         stk.pushPose();
         stk.translate(
                 -camera.getPosition().x,
@@ -239,14 +241,14 @@ public class MultiMaterialTest {
         BlockState state = Blocks.BLUE_ICE.defaultBlockState();
 
         BakedModel mdl = mc.getBlockRenderer().getBlockModel(state);
-        MultiMatModel mmdl = new MultiMatModel(mc, mdl, new ResourceLocation("skyisles:block/lamp_base"), new ResourceLocation("skyisles:block/lamp_overlay"));
+        MultiMatModel mmdl = new MultiMatModel(mc, mdl, new ResourceLocation("skyisles:block/lamp_base_off"), new ResourceLocation("skyisles:block/lamp_overlay"));
 
         for (int i = 0; i < lamps.length; i++) {
             for (int i1 = 0; i1 < bases.length; i1++) {
                 drawBlock(
                         mmdl, mc, stk, src, new BlockPos(i1, 0, i * 3),
                         new ResourceLocation("minecraft:block/" + lamps[i]),
-                        new ResourceLocation("skyisles:block/lamp_base"),
+                        new ResourceLocation("skyisles:block/lamp_base_off"),
                         new ResourceLocation("minecraft:block/" + bases[i1]),
                         new ResourceLocation("skyisles:block/lamp_overlay"),
                         false

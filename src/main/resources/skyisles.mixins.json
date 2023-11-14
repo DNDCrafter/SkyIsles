@@ -7,7 +7,9 @@
   "mixins": [
   ],
   "client": [
-    "debug.DebugRenderers"
+    "debug.DebugRenderers",
+    "render.multimat.LevelRendererMixin",
+    "render.multimat.RenderTypesMixin"
   ],
   "injectors": {
     "defaultRequire": 1

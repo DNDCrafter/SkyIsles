@@ -15,12 +15,9 @@ public class SkyTileEntities {
     public static final DeferredRegister<BlockEntityType<?>> TILE_ENTITIES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, SkyIsles.ModID);
 
 
-//	public static final RegistryObject<TileEntityType<MultiMaterialTE>> MULTIMATERIALTE = TILE_ENTITIES.register("multimaterial_block", () -> TileEntityType.Builder.create(MultiMaterialTE::new,
-//			SkyBlocks.PILLAR_BLOCK.getObject1().get()
-//	).build(null));
-//	public static final RegistryObject<TileEntityType<LampTE>> LAMPTE = TILE_ENTITIES.register("lamp_block", () -> TileEntityType.Builder.create(LampTE::new,
-//			SkyBlocks.LAMP_BLOCK.getObject1().get()
-//	).build(null));
+	public static final RegistryObject<BlockEntityType<LampBE>> LAMP_BE = TILE_ENTITIES.register("lamp", () -> BlockEntityType.Builder.of(LampBE::new,
+			SkyBlocks.LAMP_BLOCK.getObject1().get()
+	).build(null));
 
     public static final RegistryObject<BlockEntityType<ContainerBE>> DRAWER_TE = TILE_ENTITIES.register("drawer_te", () -> BlockEntityType.Builder.of(DrawerBlock::createBE,
             SkyBlocks.DRAWER_BLOCK.getObject1().get()

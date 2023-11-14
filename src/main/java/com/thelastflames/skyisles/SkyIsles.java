@@ -4,9 +4,13 @@ import com.thelastflames.skyisles.API.SkyIslesAPI;
 import com.thelastflames.skyisles.API.events.blocks.GetChestBlocksEvent;
 import com.thelastflames.skyisles.blocks.ChestBlock;
 import com.thelastflames.skyisles.registry.*;
+import com.thelastflames.skyisles.utils.client.multimat.MultiMatMdlLoader;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -16,69 +20,74 @@ import org.apache.logging.log4j.Logger;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(SkyIsles.ModID)
 public class SkyIsles {
-	
-	// Directly reference a log4j logger.
-	public static final Logger LOGGER = LogManager.getLogger();
-	
-	public static final String ModID = "skyisles";
-	
-	private static SkyIsles INSTANCE;
-	
-	public static SkyIsles getInstance() {
-		return INSTANCE;
-	}
-	
-	final IEventBus bus;
-	
-	public SkyIsles() {
-		INSTANCE = this;
-		
-		bus = FMLJavaModLoadingContext.get().getModEventBus();
-		
-		bus.addListener(this::clientSetupEvent);
-		bus.addListener(ClientSetup::registerTERS);
+
+    // Directly reference a log4j logger.
+    public static final Logger LOGGER = LogManager.getLogger();
+
+    public static final String ModID = "skyisles";
+
+    private static SkyIsles INSTANCE;
+
+    public static SkyIsles getInstance() {
+        return INSTANCE;
+    }
+
+    final IEventBus bus;
+
+    public SkyIsles() {
+        INSTANCE = this;
+
+        bus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        bus.addListener(this::onModelRegistryEvent);
+        bus.addListener(this::clientSetupEvent);
+        bus.addListener(ClientSetup::registerTERS);
 //		bus.addGenericListener(ContainerType.class, this::registerContainers);
 //		bus.addListener(this::commonSetup);
 //		SkyIslesAPI.INSTANCE.addListener(this::setupForgeRecipes);
 //		SkyIslesAPI.INSTANCE.addListener(this::collectSkyboxBlocks);
-		SkyIslesAPI.INSTANCE.addListener(this::collectChestBlocks);
-		
+        SkyIslesAPI.INSTANCE.addListener(this::collectChestBlocks);
+
 //		ITSERLookup.setupLookup();
-		
-		SkyBlocks.BLOCKS.register(bus);
-		SkyItems.ITEMS.register(bus);
+
+        SkyBlocks.BLOCKS.register(bus);
+        SkyItems.ITEMS.register(bus);
 //		SkyDimensions.MOD_DIMENSIONS.register(bus);
-		SkyTileEntities.TILE_ENTITIES.register(bus);
+        SkyTileEntities.TILE_ENTITIES.register(bus);
 //		SkyBiomes.BIOMES.register(bus);
-		
-		MinecraftForge.EVENT_BUS.register(this);
-	}
-	
+
+        MinecraftForge.EVENT_BUS.register(this);
+    }
+
 //	public static void teleportPlayer(ServerPlayerEntity player, DimensionType destinationType, BlockPos destinationPos) {
 //		ServerWorld nextWorld = player.getServer().getWorld(destinationType);
 //		nextWorld.getChunk(destinationPos);    // make sure the chunk is loaded
 //		player.teleport(nextWorld, destinationPos.getX(), destinationPos.getY(), destinationPos.getZ(), player.rotationYaw, player.rotationPitch);
 //	}
-	
-//	public void commonSetup(FMLCommonSetupEvent event) {
+
+    //	public void commonSetup(FMLCommonSetupEvent event) {
 //		ForgeRecipesEvent eventRecipes = new ForgeRecipesEvent();
 //		postEvent(eventRecipes);
 //		eventRecipes.finish();
 //		new StatsHelper().setup();
 //	}
-	
-	public void clientSetupEvent(FMLClientSetupEvent event) {
-		ClientSetup.run(event);
-	}
-	
+
+    public void onModelRegistryEvent(ModelEvent.RegisterGeometryLoaders event) {
+        event.register("multi_material", new MultiMatMdlLoader());
+    }
+
+    public void clientSetupEvent(FMLClientSetupEvent event) {
+        ClientSetup.run(event);
+    }
+
 //	public void collectSkyboxBlocks(GetSkyboxBlocksEvent event) {
 //		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK_PURPLE.getObject1().get());
 //		event.blocks.add((SkyboxBlock) SkyBlocks.SKYBOX_BLOCK.getObject1().get());
 //	}
 
-	public void collectChestBlocks(GetChestBlocksEvent event) {
-		event.blocks.add((ChestBlock) SkyBlocks.CHEST_BLOCK.get());
-	}
+    public void collectChestBlocks(GetChestBlocksEvent event) {
+        event.blocks.add((ChestBlock) SkyBlocks.CHEST_BLOCK.get());
+    }
 
 //	public void setupForgeRecipes(ForgeRecipesEvent event) {
 //		event.register(new ResourceLocation("skyisles", "metal_pickaxe"), new ToolForgeRecipe() {
@@ -236,10 +245,10 @@ public class SkyIsles {
 //				stack.getItem().getTags().contains(Tags.Items.INGOTS.getId()) ||
 //				stack.getItem().getTags().contains(Tags.Items.STONE.getId());
 //	}
-	
-	public static void postEvent(Event event) {
-		SkyIslesAPI.INSTANCE.post(event);
-	}
+
+    public static void postEvent(Event event) {
+        SkyIslesAPI.INSTANCE.post(event);
+    }
 
 //	public void registerContainers(RegistryEvent.Register<ContainerType<?>> event) {
 ////		ToolForgeContainer.TYPE = (ContainerType<ToolForgeContainer>) new ContainerType<>(ToolForgeContainer::new).setRegistryName("skyisles", "toolforge");
@@ -250,7 +259,7 @@ public class SkyIsles {
 ////		ToolForgeContainer.TYPE=register("skyislestoolforge",ToolForgeContainer::new);
 ////		System.out.println(ToolForgeContainer.TYPE.toString());
 //	}
-	
+
 //	private static <T extends Container> ContainerType<T> register(String key, ContainerType.IFactory<T> factory) {
 //		return Registry.register(Registry.MENU, key, new ContainerType<>(factory));
 //	}

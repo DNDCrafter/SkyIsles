@@ -5,6 +5,7 @@ import com.thelastflames.skyisles.SkyIsles;
 import com.thelastflames.skyisles.blocks.*;
 import com.thelastflames.skyisles.items.DefaultNBTBlockItem;
 import com.thelastflames.skyisles.utils.BiRegistry;
+import com.thelastflames.skyisles.utils.NBTUtil;
 import net.minecraft.client.resources.PaintingTextureManager;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -23,8 +24,8 @@ import java.util.function.Supplier;
 public class SkyBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SkyIsles.ModID);
 
-//	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:iron_ingot;minecraft:gold_ingot").Package())));
-//	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", new LampBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:glowstone;minecraft:black_concrete").Package())));
+    //	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> PILLAR_BLOCK = registerBlockWithItem("pillar", new PillarBlock(), 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:iron_ingot;minecraft:gold_ingot").Package())));
+    public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> LAMP_BLOCK = registerBlockWithItem("lamp_block", LampBlock::new, 64, CreativeTabs.BUILDING_BLOCKS, null, NBTUtil.createNBT(new NBTUtil.NBTObjectHolder<>("BlockEntityTag", new NBTUtil.NBTObjectHolder<>("materials", "minecraft:glowstone;minecraft:black_concrete").pack())));
     public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> DRAWER_BLOCK = registerBlockWithItem("drawer_block", DrawerBlock::new, 64, CreativeTabs.BUILDING_BLOCKS, null, null);
 //	public static final BiRegistry<RegistryObject<Block>, RegistryObject<Item>> SKYBOX_BLOCK = registerBlockWithItem("skybox_test", new SkyIslesSkyboxBlock(Block.Properties.from(Blocks.COBBLESTONE),
 //			new ResourceLocation("skyisles:textures/block/skybox.png"),

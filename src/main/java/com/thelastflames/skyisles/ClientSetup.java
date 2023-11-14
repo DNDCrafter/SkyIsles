@@ -3,6 +3,7 @@ package com.thelastflames.skyisles;
 import com.thelastflames.skyisles.client.block.ChestTESR;
 import com.thelastflames.skyisles.registry.SkyBlocks;
 import com.thelastflames.skyisles.registry.SkyTileEntities;
+import com.thelastflames.skyisles.utils.client.multimat.MultiMatBakedModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -32,6 +33,9 @@ public class ClientSetup {
 	public static void setupRenderLayers() {
 //		RenderTypeLookup.setRenderLayer(SkyBlocks.LAMP_BLOCK.getObject1().get(), RenderType.getCutout());
 		ItemBlockRenderTypes.setRenderLayer(SkyBlocks.DRAWER_BLOCK.getObject1().get(), RenderType.cutout());
+		ItemBlockRenderTypes.setRenderLayer(SkyBlocks.LAMP_BLOCK.getObject1().get(), (type)->{
+			return type == RenderType.solid() || type == MultiMatBakedModel.MULTIPLICATIVE;
+		});
 //		RenderTypeLookup.setRenderLayer(SkyBlocks.ITEM_OBSERVER.getObject1().get(), RenderType.getCutout());
 	}
 	
