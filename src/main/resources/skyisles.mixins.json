@@ -5,6 +5,7 @@
   "package": "com.thelastflames.skyisles.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "generation.ChunkAccessAccessor"
   ],
   "client": [
     "debug.DebugRenderers",

@@ -5,6 +5,8 @@ import com.thelastflames.skyisles.API.events.blocks.GetChestBlocksEvent;
 import com.thelastflames.skyisles.blocks.ChestBlock;
 import com.thelastflames.skyisles.registry.*;
 import com.thelastflames.skyisles.utils.client.multimat.MultiMatMdlLoader;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -52,7 +54,7 @@ public class SkyIsles {
 
         SkyBlocks.BLOCKS.register(bus);
         SkyItems.ITEMS.register(bus);
-//		SkyDimensions.MOD_DIMENSIONS.register(bus);
+		SkyChunkGenerators.GENERATORS.register(bus);
         SkyTileEntities.TILE_ENTITIES.register(bus);
 //		SkyBiomes.BIOMES.register(bus);
 

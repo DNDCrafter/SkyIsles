@@ -1,0 +1,32 @@
+{
+  "type": "skyisles:test_dim",
+  "generator": {
+    "type": "skyisles:skyisles",
+    "settings": {
+      "minY": 0,
+      "maxY": 128,
+      "scale": 64.0,
+      "seed": 8344,
+      "horizontal_scale": 1000,
+      "bias": 0.5,
+      "terrain_noise": {
+        "seed_offset": 0,
+        "type": "simplex_amplitudes",
+        "amplitudes": [
+          1, 1, 2, 1, 2, 1, 0, 2, 0
+        ]
+      },
+      "shape_noise": {
+        "seed_offset": 0,
+        "type": "perlin_simplex",
+        "amplitudes": [
+          1, -1, -1
+        ]
+      }
+    },
+    "biome_source": {
+      "type": "minecraft:multi_noise",
+      "preset": "minecraft:overworld"
+    }
+  }
+}
