@@ -84,9 +84,9 @@ public class AmplitudiousNoiseWrapper extends NoiseWrapper {
         double d2 = this.lowestFreqValueFactor;
 
         for (int i = 0; i < this.noiseLevels.length; ++i) {
-            NoiseWrapper improvednoise = this.noiseLevels[i];
-            if (improvednoise != null) {
-                double d3 = improvednoise.get(wrap(x * d1), wrap(y * d1 / 1000.0), wrap(z * d1));
+            NoiseWrapper wrapper = this.noiseLevels[i];
+            if (wrapper != null) {
+                double d3 = wrapper.get(wrap(x * d1), wrap(y * d1), wrap(z * d1));
                 d0 += this.amplitudes.getDouble(i) * d3 * d2;
             }
 

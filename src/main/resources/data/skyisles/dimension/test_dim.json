@@ -5,13 +5,15 @@
     "settings": {
       "minY": 0,
       "maxY": 128,
-      "scale": 64.0,
-      "seed": 8344,
+      "scale": 32.0,
       "horizontal_scale": 1000,
       "bias": 0.5,
       "terrain_noise": {
         "seed_offset": 0,
         "type": "simplex_amplitudes",
+        "x_factor": 0.5,
+        "y_factor": 0.001,
+        "z_factor": 0.5,
         "amplitudes": [
           1, 1, 2, 1, 2, 1, 0, 2, 0
         ]
@@ -25,8 +27,8 @@
       }
     },
     "biome_source": {
-      "type": "minecraft:multi_noise",
-      "preset": "minecraft:overworld"
+      "type": "minecraft:fixed",
+      "biome": "minecraft:plains"
     }
   }
 }

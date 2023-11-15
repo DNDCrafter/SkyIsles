@@ -9,6 +9,7 @@ import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.*;
 import com.thelastflames.skyisles.codec.CustomCodecs;
 
@@ -17,15 +18,21 @@ import java.util.stream.IntStream;
 
 public record SkyIslesGeneratorSettings(
         BlockState defaultBlock, int minY, int maxY,
-        double verticalScale, double horizontalScale,
-        double bias, SINoiseSettings terrain, SINoiseSettings shape,
-        Optional<Long> seed
+        double verticalScale, double horizontalScale, double bias, // terrain shapping
+        SINoiseSettings terrain, SINoiseSettings shape, SINoiseSettings bottom, // noise
+        Optional<Long> seed // mojang, why don't you provide a seed o world generators when they're created?
 ) {
     private static final SINoiseSettings TERRAIN = new SINoiseSettings(
-            0, "perlin", IntStream.of(1, 1, 2, 1, 2, 1, 0, 2, 0)
+            0, "simplex_amplitudes", IntStream.of(1, 1, 2, 1, 2, 1, 0, 2, 0),
+            0.5, 0.001, 0.5, 1
     );
     private static final SINoiseSettings SHAPE = new SINoiseSettings(
-            0, "perlin_simplex", IntStream.of(1, -1, -1)
+            0, "perlin_simplex", IntStream.of(1, -1, -1),
+            1, 1, 1, 1
+    );
+    private static final SINoiseSettings BOTTOM = new SINoiseSettings(
+            0, "simplex_amplitudes", IntStream.of(1, 1, 2, 1, 2, 3, 2, 1, 0),
+            1, 1, 1, 0.2
     );
 
     public static final Codec<SkyIslesGeneratorSettings> DIRECT_CODEC = RecordCodecBuilder.create((p_64475_) -> {
@@ -38,12 +45,22 @@ public record SkyIslesGeneratorSettings(
                 Codec.DOUBLE.fieldOf("island_bias").orElse(0.5).forGetter(SkyIslesGeneratorSettings::bias),
                 SINoiseSettings.CODEC.fieldOf("terrain_noise").orElse(TERRAIN).forGetter(SkyIslesGeneratorSettings::terrain),
                 SINoiseSettings.CODEC.fieldOf("shape_noise").orElse(SHAPE).forGetter(SkyIslesGeneratorSettings::shape),
+                SINoiseSettings.CODEC.fieldOf("bottom_noise").orElse(BOTTOM).forGetter(SkyIslesGeneratorSettings::bottom),
                 CustomCodecs.OPTIONAL_LONG.fieldOf("seed").forGetter(SkyIslesGeneratorSettings::seed)
         ).apply(p_64475_, SkyIslesGeneratorSettings::new);
     });
 
     public WorldgenRandom.Algorithm getRandomSource() {
         return WorldgenRandom.Algorithm.XOROSHIRO;
+    }
+
+    public long getSeed(LevelHeightAccessor pLevel) {
+        if (seed.isPresent())
+            return seed.get();
+
+        if (pLevel instanceof ChunkAccess) return getSeed((ChunkAccess) pLevel);
+        if (pLevel instanceof ServerLevel) return ((ServerLevel) pLevel).getSeed();
+        return 0;
     }
 
     public long getSeed(ChunkAccess pChunk) {

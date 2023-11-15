@@ -3,10 +3,13 @@ package com.thelastflames.skyisles.chunk_generators;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thelastflames.skyisles.chunk_generators.noise.NoiseWrapper;
+import com.thelastflames.skyisles.chunk_generators.noise.SINoiseSettings;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.NoiseColumn;
 import net.minecraft.world.level.StructureManager;
@@ -14,15 +17,15 @@ import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkGenerator;
-import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.stream.IntStream;
 
 public class SkyIslesChunkGenerator extends ChunkGenerator {
     public static final Codec<SkyIslesChunkGenerator> CODEC = RecordCodecBuilder.create((builder) -> {
@@ -34,18 +37,14 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 
     private final SkyIslesGeneratorSettings settings;
 
-    //    PerlinNoise noise = PerlinNoise.create(
-//            settings.getRandomSource().newInstance(432532),
-//            0, 1, 1.0, 2.0, 1.0, 2.0, 1.0, 0.0, 2.0, 0.0
-//    );
-//    PerlinSimplexNoise noiseShape = new PerlinSimplexNoise(
-//            settings.getRandomSource().newInstance(432532),
-//            Arrays.asList(1, -1, -1)
-//    );
-
     public SkyIslesChunkGenerator(BiomeSource biomeSource, SkyIslesGeneratorSettings settings) {
         super(biomeSource);
         this.settings = settings;
+    }
+
+    @Override
+    public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> pStructureSetLookup, RandomState pRandomState, long pSeed) {
+        return super.createState(pStructureSetLookup, pRandomState, pSeed);
     }
 
     @Override
@@ -60,7 +59,34 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion pLevel, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk) {
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                int iBlock = 3;
+                boolean surface = true;
+                int my = pChunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
+                my = Math.min(my, pChunk.getMaxBuildHeight() + 3);
+                for (int y = my; y >= pChunk.getMinBuildHeight(); y--) {
+                    boolean iiBlock = pChunk.getBlockState(new BlockPos(x, y, z)).isAir();
+                    if (iBlock > 0) {
+                        if (!iiBlock) {
+                            pChunk.setBlockState(new BlockPos(x, y, z),
+                                    surface ?
+                                            Blocks.GRASS_BLOCK.defaultBlockState() :
+                                            Blocks.DIRT.defaultBlockState()
+                                    , false);
+                        }
+                    }
 
+                    if (!iiBlock) {
+                        iBlock -= 1;
+                        surface = false;
+                    } else {
+                        iBlock = pRandom.oreRandom().at(x, y, z).nextInt(2, 4);
+                        surface = true;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -88,11 +114,10 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
     }
 
     private ChunkAccess doFill(Blender pBlender, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk, int pMinCellY, int pCellCountY) {
-        NoiseWrapper noise;
-        NoiseWrapper noiseShape;
         long seed = settings.getSeed(pChunk);
-        noise = settings.terrain().create(seed);
-        noiseShape = settings.shape().create(seed);
+        NoiseWrapper noise = settings.terrain().create(seed);
+        NoiseWrapper noiseShape = settings.shape().create(seed);
+        NoiseWrapper noiseBottom = settings.bottom().create(seed);
 
         int mx = pChunk.getPos().getMinBlockX();
         int mz = pChunk.getPos().getMinBlockZ();
@@ -100,6 +125,8 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
         double hscl = settings.horizontalScale();
         double bias = settings.bias();
         double inv_bias = 1 - bias;
+
+        int middleY = (settings.maxY() - settings.minY()) / 2;
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -117,28 +144,20 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
                         scl = Math.abs(scl);
                         if (scl < 0) scl = 0;
                         v += 1 - scl;
+
+                        // rough bottom
+                        if (y <= middleY) {
+                            v -= noiseBottom.get((mx + x) / 30.0, (mz + z) / 30.0, 0) * 0.2;
+                        }
+
                         v *= (sv - bias) * (1 / inv_bias);
 
                         if (v > 0.5) {
-                            if (x == 0 || z == 0) {
-                                pChunk.setBlockState(
-                                        new BlockPos(x, y, z),
-                                        Blocks.GOLD_BLOCK.defaultBlockState(),
-                                        false
-                                );
-                            } else if (x == 15 || z == 15) {
-                                pChunk.setBlockState(
-                                        new BlockPos(x, y, z),
-                                        Blocks.DIAMOND_BLOCK.defaultBlockState(),
-                                        false
-                                );
-                            } else {
-                                pChunk.setBlockState(
-                                        new BlockPos(x, y, z),
-                                        Blocks.STONE.defaultBlockState(),
-                                        false
-                                );
-                            }
+                            pChunk.setBlockState(
+                                    new BlockPos(x, y, z),
+                                    Blocks.STONE.defaultBlockState(),
+                                    false
+                            );
                         }
                     }
                 }
@@ -161,20 +180,66 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
     @Override
     public int getBaseHeight(int pX, int pZ, Heightmap.Types pType, LevelHeightAccessor pLevel, RandomState
             pRandom) {
-        return (this.settings.minY() + this.settings.maxY()) / 2;
+        long seed = settings.getSeed(pLevel);
+        NoiseWrapper noise = settings.terrain().create(seed);
+        NoiseWrapper noiseShape = settings.shape().create(seed);
+        NoiseWrapper noiseBottom = settings.bottom().create(seed);
+
+        if (pLevel instanceof ProtoChunk) {
+            if (((ProtoChunk) pLevel).getStatus() != ChunkStatus.EMPTY) {
+                ChunkPos cp = new ChunkPos(new BlockPos(pX, 0, pZ));
+                return ((ProtoChunk) pLevel).getHeight(pType, pX - cp.getMinBlockX(), pZ - cp.getMinBlockZ());
+            }
+        }
+
+        int midY = (this.settings.minY() + this.settings.maxY()) / 2;
+        double hscl = this.settings.horizontalScale();
+        double bias = settings.bias();
+        double inv_bias = 1 - bias;
+
+        double sv = noiseShape.get((pX) / hscl, (pZ) / hscl) + 0.5;
+        for (int y = midY; y < pLevel.getMaxBuildHeight(); y++) {
+            if (y < settings.minY()) continue;
+            if (y > settings.maxY()) continue;
+
+            double v = noise.get((pX) / hscl, y / 100.0, (pZ) / hscl) + 0.5;
+
+            double scl = y - (settings.maxY() - settings.minY()) / 2d;
+            scl /= settings.verticalScale() / 2d;
+            scl = Math.abs(scl);
+            if (scl < 0) scl = 0;
+            v += 1 - scl;
+
+            // rough bottom
+            if (y <= midY) {
+                v -= noiseBottom.get((pX) / 30.0, (pZ) / 30.0, 0) * 0.2;
+            }
+
+            v *= (sv - bias) * (1 / inv_bias);
+
+            if (v < 0.5) {
+                if (y == midY)
+                    return pLevel.getMinBuildHeight() - 1000; // no terrain
+
+                return y;
+            }
+        }
+
+        return pLevel.getMinBuildHeight() - 1000; // no terrain
     }
 
     @Override
     public NoiseColumn getBaseColumn(int pX, int pZ, LevelHeightAccessor pHeight, RandomState pRandom) {
         BlockState[] states = new BlockState[pHeight.getMaxBuildHeight() - pHeight.getMinBuildHeight()];
-        for (int i = 0; i < states.length; i++) {
+        for (int i = 0; i < states.length; i++)
             states[i] = Blocks.AIR.defaultBlockState();
-        }
         return new NoiseColumn(pHeight.getMinBuildHeight(), states);
     }
 
     @Override
     public void addDebugScreenInfo(List<String> pInfo, RandomState pRandom, BlockPos pPos) {
-
+        pInfo.add("Y Range: " + settings.minY() + " -> " + settings.maxY());
+        pInfo.add("Scale: " + settings.horizontalScale() + ", " + settings.verticalScale());
+        pInfo.add("Island Bias: " + settings.bias());
     }
 }
