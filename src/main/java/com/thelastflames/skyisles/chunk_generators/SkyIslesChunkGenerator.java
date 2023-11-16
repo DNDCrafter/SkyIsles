@@ -4,12 +4,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thelastflames.skyisles.chunk_generators.noise.NoiseWrapper;
 import com.thelastflames.skyisles.chunk_generators.noise.SINoiseSettings;
+import com.thelastflames.skyisles.chunk_generators.structure.test.TestStructure;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.data.worldgen.Structures;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
@@ -19,8 +22,10 @@ import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -49,6 +54,8 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion pLevel, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk) {
+        if (true) return;
+
         int midY = (settings.maxY() - settings.minY()) / 2;
 
         for (int x = 0; x < 16; x++) {
@@ -160,13 +167,17 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
                         if (scl < 0) scl = 0;
                         v += 1 - scl;
 
+                        double svScaled = (sv - bias) * (1 / inv_bias);
+
                         boolean would = (v * (sv - bias) * (1 / inv_bias)) > 0.5;
                         // rough bottom
                         if (y <= middleY) {
-                            v -= noiseBottom.get((mx + x) / 30.0, (mz + z) / 30.0);
+                            double bv = noiseBottom.get((mx + x) / 30.0, (mz + z) / 30.0);
+                            bv *= (svScaled);
+                            v -= bv;
                         }
 
-                        v *= (sv - bias) * (1 / inv_bias);
+                        v *= svScaled;
 
                         if (v > 0.5) {
                             if (!would && y >= middleY) {
@@ -261,7 +272,6 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
     }
 
 
-
     //    int px;
 //    int pz;
 
@@ -283,15 +293,23 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 //                px + 0.5, pPos.getY() + 0.5, pz + 0.5
 //        )));
     }
+
     @Override
     public void applyBiomeDecoration(WorldGenLevel pLevel, ChunkAccess pChunk, StructureManager pStructureManager) {
         super.applyBiomeDecoration(pLevel, pChunk, pStructureManager);
+        TestStructure structure = new TestStructure();
+        RandomSource src = RandomSource.create(pLevel.getSeed());
+        PositionalRandomFactory factory = new XoroshiroRandomSource.XoroshiroPositionalRandomFactory(src.nextLong(), src.nextLong());
+        for (ChunkPos chunkPos : structure.layout(factory, pChunk, this, null)) {
+            structure.generate(factory, chunkPos, pChunk, this);
+        }
     }
 
     @Override
     public void createStructures(RegistryAccess pRegistryAccess, ChunkGeneratorStructureState pStructureState, StructureManager pStructureManager, ChunkAccess pChunk, StructureTemplateManager pStructureTemplateManager) {
-        super.createStructures(pRegistryAccess, pStructureState, pStructureManager, pChunk, pStructureTemplateManager);
+//        super.createStructures(pRegistryAccess, pStructureState, pStructureManager, pChunk, pStructureTemplateManager);
     }
+
     @Override
     public void spawnOriginalMobs(WorldGenRegion pLevel) {
 
