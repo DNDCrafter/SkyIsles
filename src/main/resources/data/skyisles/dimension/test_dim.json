@@ -48,7 +48,6 @@
             "snowy": "false"
           }
         },
-        "overhang_state": "minecraft:stone",
         "edge_states": [
           {
             "Name": "minecraft:grass_block",

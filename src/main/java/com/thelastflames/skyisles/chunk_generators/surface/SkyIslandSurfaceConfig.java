@@ -23,7 +23,7 @@ public record SkyIslandSurfaceConfig(
                 CustomCodecs.SIMPLE_STATE.fieldOf("base_block").orElse(Blocks.STONE.defaultBlockState()).forGetter(SkyIslandSurfaceConfig::baseState),
                 CustomCodecs.SIMPLE_STATE.fieldOf("dirt_block").orElse(Blocks.DIRT.defaultBlockState()).forGetter(SkyIslandSurfaceConfig::dirtState),
                 CustomCodecs.SIMPLE_STATE.fieldOf("surface_block").orElse(Blocks.GRASS_BLOCK.defaultBlockState()).forGetter(SkyIslandSurfaceConfig::surfaceState),
-                CustomCodecs.OPTIONAL_BLOCKSTATE.fieldOf("overhang_state").orElse(Optional.of(Blocks.GRAVEL.defaultBlockState())).forGetter(SkyIslandSurfaceConfig::overhangState),
+                CustomCodecs.OPTIONAL_BLOCKSTATE.fieldOf("overhang_state").orElse(Optional.empty()).forGetter(SkyIslandSurfaceConfig::overhangState),
                 CustomCodecs.BLOCKSTATE_LIST.fieldOf("edge_states").orElse(Arrays.asList(Blocks.GRASS_BLOCK.defaultBlockState())).forGetter(SkyIslandSurfaceConfig::edgeStates)
         ).apply(p_64475_, SkyIslandSurfaceConfig::new);
     });
