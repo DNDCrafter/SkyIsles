@@ -1,11 +1,12 @@
 package com.thelastflames.skyisles.codec;
 
 import com.mojang.datafixers.util.Either;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.MapCodec;
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.PrimitiveCodec;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public abstract class OptionalPrimitiveCodec<E> implements PrimitiveCodec<Optional<E>> {
@@ -31,14 +32,31 @@ public abstract class OptionalPrimitiveCodec<E> implements PrimitiveCodec<Option
     }
 
     @Override
-    public <T> T write(final DynamicOps<T> ops, final Optional<E> value) {
-        if (value.isPresent())
-            return writeValue(ops, value.get());
-        else return ops.empty();
+    public <T> DataResult<Pair<Optional<E>, T>> decode(DynamicOps<T> ops, T input) {
+        DataResult<MapLike<T>> m = ops.getMap(input);
+        MapLike<T> mp = m.get().map(l -> l, r -> null);
+        if (mp != null && mp.entries().count() == 0) return DataResult.success(Pair.of(Optional.empty(), input));
+
+        return PrimitiveCodec.super.decode(ops, input);
+    }
+
+    @Override
+    public <T> DataResult<T> encode(Optional<E> input, DynamicOps<T> ops, T prefix) {
+        if (input.isPresent())
+            return DataResult.success(writeValue(ops, input.get()));
+        else {
+            HashMap<T, T> s = new HashMap<>();
+            return ops.mergeToMap(prefix, s);
+        }
     }
 
     @Override
     public String toString() {
         return "Long";
+    }
+
+    @Override
+    public <T> T write(DynamicOps<T> ops, Optional<E> value) {
+        throw new RuntimeException();
     }
 }

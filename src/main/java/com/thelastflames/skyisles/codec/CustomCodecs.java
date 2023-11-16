@@ -31,11 +31,9 @@ public class CustomCodecs {
 
     public static final FallbackCodec<BlockState> SIMPLE_STATE = new FallbackCodec<>(
             BlockState.CODEC,
-            (str) -> {
-                return ForgeRegistries.BLOCKS.getValue(
-                        new ResourceLocation(str)
-                ).defaultBlockState();
-            }
+            (str) -> ForgeRegistries.BLOCKS.getValue(
+                    new ResourceLocation(str)
+            ).defaultBlockState()
     );
     public static final OptionalCodec<BlockState> OPTIONAL_BLOCKSTATE = new OptionalCodec<>(SIMPLE_STATE);
     public static final ListCodec<BlockState> BLOCKSTATE_LIST = new ListCodec<>(SIMPLE_STATE);
