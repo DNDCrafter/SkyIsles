@@ -7,12 +7,10 @@ import com.thelastflames.skyisles.chunk_generators.noise.SINoiseSettings;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.LevelHeightAccessor;
-import net.minecraft.world.level.NoiseColumn;
-import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.biome.BiomeSource;
 import net.minecraft.world.level.block.Blocks;
@@ -21,6 +19,7 @@ import net.minecraft.world.level.chunk.*;
 import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,18 +43,8 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
     }
 
     @Override
-    public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> pStructureSetLookup, RandomState pRandomState, long pSeed) {
-        return super.createState(pStructureSetLookup, pRandomState, pSeed);
-    }
-
-    @Override
     protected Codec<SkyIslesChunkGenerator> codec() {
         return CODEC;
-    }
-
-    @Override
-    public void applyCarvers(WorldGenRegion pLevel, long pSeed, RandomState pRandom, BiomeManager pBiomeManager, StructureManager pStructureManager, ChunkAccess pChunk, GenerationStep.Carving pStep) {
-
     }
 
     @Override
@@ -75,17 +64,18 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
                     boolean iEdgeA = false;
                     if (overhang.isPresent())
                         iEdgeA = pChunk.getBlockState(new BlockPos(x, my - 1, z)).equals(Blocks.OBSIDIAN.defaultBlockState());
-                    // stone
                     if (iEdgeA) {
+                        // stone
                         pChunk.setBlockState(new BlockPos(x, my - 1, z), overhang.get(), false);
                     } else {
+                        // crumble
                         BlockPos cPos = new BlockPos(x, my - 1, z);
 
                         int rand = pRandom.oreRandom().at(cPos).nextInt(settings.surfaceConfig().edgeStates().size());
                         pChunk.setBlockState(new BlockPos(x, my - 1, z), settings.surfaceConfig().edgeStates().get(rand), false);
                     }
                 } else {
-                    // grass
+                    // grass&dirt
                     for (int y = my; y >= pChunk.getMinBuildHeight(); y--) {
                         BlockState state = pChunk.getBlockState(new BlockPos(x, y, z));
 
@@ -117,11 +107,6 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
                 }
             }
         }
-    }
-
-    @Override
-    public void spawnOriginalMobs(WorldGenRegion pLevel) {
-
     }
 
     @Override
@@ -275,10 +260,50 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
         return new NoiseColumn(pHeight.getMinBuildHeight(), states);
     }
 
+
+
+    //    int px;
+//    int pz;
+
     @Override
     public void addDebugScreenInfo(List<String> pInfo, RandomState pRandom, BlockPos pPos) {
         pInfo.add("Y Range: " + settings.minY() + " -> " + settings.maxY());
         pInfo.add("Scale: " + settings.horizontalScale() + ", " + settings.verticalScale());
         pInfo.add("Island Bias: " + settings.bias());
+
+//        int h = getBaseHeight(pPos.getX(), pPos.getZ(), Heightmap.Types.WORLD_SURFACE_WG, null, pRandom);
+//        if (h > 0) {
+//            px = pPos.getX();
+//            pz = pPos.getZ();
+//        }
+//
+//        pInfo.add("From: " + px + ", " + pz);
+//        pInfo.add("To: " + pPos.getX() + ", " + pPos.getZ());
+//        pInfo.add("Dist: " + Math.sqrt(pPos.distToCenterSqr(
+//                px + 0.5, pPos.getY() + 0.5, pz + 0.5
+//        )));
+    }
+    @Override
+    public void applyBiomeDecoration(WorldGenLevel pLevel, ChunkAccess pChunk, StructureManager pStructureManager) {
+        super.applyBiomeDecoration(pLevel, pChunk, pStructureManager);
+    }
+
+    @Override
+    public void createStructures(RegistryAccess pRegistryAccess, ChunkGeneratorStructureState pStructureState, StructureManager pStructureManager, ChunkAccess pChunk, StructureTemplateManager pStructureTemplateManager) {
+        super.createStructures(pRegistryAccess, pStructureState, pStructureManager, pChunk, pStructureTemplateManager);
+    }
+    @Override
+    public void spawnOriginalMobs(WorldGenRegion pLevel) {
+
+    }
+
+    @Override
+    public void applyCarvers(WorldGenRegion pLevel, long pSeed, RandomState pRandom, BiomeManager pBiomeManager, StructureManager pStructureManager, ChunkAccess pChunk, GenerationStep.Carving pStep) {
+
+    }
+
+    @Override
+    public ChunkGeneratorStructureState createState(HolderLookup<StructureSet> pStructureSetLookup, RandomState pRandomState, long pSeed) {
+        return super.createState(pStructureSetLookup, pRandomState, pSeed);
     }
 }
