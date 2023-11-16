@@ -3,25 +3,34 @@ package com.thelastflames.skyisles.chunk_generators;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.thelastflames.skyisles.chunk_generators.noise.SINoiseSettings;
+import com.thelastflames.skyisles.chunk_generators.surface.SkyIslandSurfaceConfig;
 import com.thelastflames.skyisles.mixins.generation.ChunkAccessAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ProtoChunk;
 import net.minecraft.world.level.levelgen.*;
 import com.thelastflames.skyisles.codec.CustomCodecs;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 public record SkyIslesGeneratorSettings(
-        BlockState defaultBlock, int minY, int maxY,
+        int minY, int maxY,
         double verticalScale, double horizontalScale, double bias, // terrain shapping
         SINoiseSettings terrain, SINoiseSettings shape, SINoiseSettings bottom, // noise
+        SkyIslandSurfaceConfig surfaceConfig, // yeh
         Optional<Long> seed // mojang, why don't you provide a seed o world generators when they're created?
 ) {
+    public static final SkyIslandSurfaceConfig DEFAULT_SURFACE = new SkyIslandSurfaceConfig(
+            Blocks.STONE.defaultBlockState(),
+            Blocks.DIRT.defaultBlockState(),
+            Blocks.GRASS_BLOCK.defaultBlockState(),
+            Optional.of(Blocks.GRAVEL.defaultBlockState()),
+            Arrays.asList(Blocks.STONE.defaultBlockState(), Blocks.COBBLESTONE.defaultBlockState(), Blocks.GRASS_BLOCK.defaultBlockState())
+    );
+
     private static final SINoiseSettings TERRAIN = new SINoiseSettings(
             0, "simplex_amplitudes", IntStream.of(1, 1, 2, 1, 2, 1, 0, 2, 0),
             0.5, 0.001, 0.5, 1
@@ -37,7 +46,6 @@ public record SkyIslesGeneratorSettings(
 
     public static final Codec<SkyIslesGeneratorSettings> DIRECT_CODEC = RecordCodecBuilder.create((p_64475_) -> {
         return p_64475_.group(
-                BlockState.CODEC.fieldOf("default_block").orElse(Blocks.AIR.defaultBlockState()).forGetter(SkyIslesGeneratorSettings::defaultBlock),
                 Codec.INT.fieldOf("minY").orElse(0).forGetter(SkyIslesGeneratorSettings::minY),
                 Codec.INT.fieldOf("maxY").orElse(128).forGetter(SkyIslesGeneratorSettings::maxY),
                 Codec.DOUBLE.fieldOf("vertical_scale").orElse(64.0).forGetter(SkyIslesGeneratorSettings::verticalScale),
@@ -46,6 +54,7 @@ public record SkyIslesGeneratorSettings(
                 SINoiseSettings.CODEC.fieldOf("terrain_noise").orElse(TERRAIN).forGetter(SkyIslesGeneratorSettings::terrain),
                 SINoiseSettings.CODEC.fieldOf("shape_noise").orElse(SHAPE).forGetter(SkyIslesGeneratorSettings::shape),
                 SINoiseSettings.CODEC.fieldOf("bottom_noise").orElse(BOTTOM).forGetter(SkyIslesGeneratorSettings::bottom),
+                SkyIslandSurfaceConfig.CODEC.fieldOf("surface").orElse(DEFAULT_SURFACE).forGetter(SkyIslesGeneratorSettings::surfaceConfig),
                 CustomCodecs.OPTIONAL_LONG.fieldOf("seed").forGetter(SkyIslesGeneratorSettings::seed)
         ).apply(p_64475_, SkyIslesGeneratorSettings::new);
     });

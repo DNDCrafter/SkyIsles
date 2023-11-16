@@ -5,9 +5,12 @@
     "settings": {
       "minY": 0,
       "maxY": 128,
+
       "scale": 32.0,
       "horizontal_scale": 1000,
+
       "bias": 0.5,
+
       "terrain_noise": {
         "seed_offset": 0,
         "type": "simplex_amplitudes",
@@ -18,14 +21,47 @@
           1, 1, 2, 1, 2, 1, 0, 2, 0
         ]
       },
+
       "shape_noise": {
         "seed_offset": 0,
         "type": "perlin_simplex",
         "amplitudes": [
           1, -1, -1
         ]
+      },
+
+      "bottom_noise": {
+        "seed_offset": 0,
+        "type": "simplex_amplitudes",
+        "amplitudes": [
+          1, 1, 2, 1, 2, 3, 2, 1, 0
+        ],
+        "scale": 0.2
+      },
+
+      "surface": {
+        "base_block": "minecraft:stone",
+        "dirt_block": "minecraft:dirt",
+        "surface_block": {
+          "Name": "minecraft:grass_block",
+          "Properties": {
+            "snowy": "false"
+          }
+        },
+        "overhang_state": "minecraft:stone",
+        "edge_states": [
+          {
+            "Name": "minecraft:grass_block",
+            "Properties": {
+              "snowy": "false"
+            }
+          },
+          "minecraft:stone",
+          "minecraft:cobblestone"
+        ]
       }
     },
+
     "biome_source": {
       "type": "minecraft:fixed",
       "biome": "minecraft:plains"

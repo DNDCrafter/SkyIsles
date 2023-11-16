@@ -23,6 +23,7 @@ import net.minecraft.world.level.levelgen.blending.Blender;
 import net.minecraft.world.level.levelgen.structure.StructureSet;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.stream.IntStream;
@@ -59,30 +60,59 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion pLevel, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk) {
+        int midY = (settings.maxY() - settings.minY()) / 2;
+
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 int iBlock = 3;
                 boolean surface = true;
                 int my = pChunk.getHeight(Heightmap.Types.MOTION_BLOCKING, x, z) + 1;
                 my = Math.min(my, pChunk.getMaxBuildHeight() + 3);
-                for (int y = my; y >= pChunk.getMinBuildHeight(); y--) {
-                    boolean iiBlock = pChunk.getBlockState(new BlockPos(x, y, z)).isAir();
-                    if (iBlock > 0) {
-                        if (!iiBlock) {
-                            pChunk.setBlockState(new BlockPos(x, y, z),
-                                    surface ?
-                                            Blocks.GRASS_BLOCK.defaultBlockState() :
-                                            Blocks.DIRT.defaultBlockState()
-                                    , false);
-                        }
-                    }
+                boolean iEdge = (my - 1) == midY;
 
-                    if (!iiBlock) {
-                        iBlock -= 1;
-                        surface = false;
+                if (iEdge) {
+                    Optional<BlockState> overhang = settings.surfaceConfig().overhangState();
+                    boolean iEdgeA = false;
+                    if (overhang.isPresent())
+                        iEdgeA = pChunk.getBlockState(new BlockPos(x, my - 1, z)).equals(Blocks.OBSIDIAN.defaultBlockState());
+                    // stone
+                    if (iEdgeA) {
+                        pChunk.setBlockState(new BlockPos(x, my - 1, z), overhang.get(), false);
                     } else {
-                        iBlock = pRandom.oreRandom().at(x, y, z).nextInt(2, 4);
-                        surface = true;
+                        BlockPos cPos = new BlockPos(x, my - 1, z);
+
+                        int rand = pRandom.oreRandom().at(cPos).nextInt(settings.surfaceConfig().edgeStates().size());
+                        pChunk.setBlockState(new BlockPos(x, my - 1, z), settings.surfaceConfig().edgeStates().get(rand), false);
+                    }
+                } else {
+                    // grass
+                    for (int y = my; y >= pChunk.getMinBuildHeight(); y--) {
+                        BlockState state = pChunk.getBlockState(new BlockPos(x, y, z));
+
+                        boolean iiBlock = state.isAir();
+                        if (iBlock > 0) {
+                            if (!iiBlock) {
+                                pChunk.setBlockState(new BlockPos(x, y, z),
+                                        surface ?
+                                                settings.surfaceConfig().surfaceState() :
+                                                settings.surfaceConfig().dirtState()
+                                        , false);
+                            }
+                        } else if (!iiBlock) {
+                            pChunk.setBlockState(new BlockPos(x, y, z), settings.surfaceConfig().baseState(), false);
+                        }
+
+                        if (my <= midY) {
+                            iBlock = 0;
+                        } else {
+                            if (!iiBlock) {
+                                iBlock -= 1;
+                                surface = false;
+                            } else {
+                                iBlock = pRandom.oreRandom().at(x, y, z).nextInt(2, 4);
+                                surface = true;
+                            }
+                        }
                     }
                 }
             }
@@ -145,19 +175,28 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
                         if (scl < 0) scl = 0;
                         v += 1 - scl;
 
+                        boolean would = (v * (sv - bias) * (1 / inv_bias)) > 0.5;
                         // rough bottom
                         if (y <= middleY) {
-                            v -= noiseBottom.get((mx + x) / 30.0, (mz + z) / 30.0, 0) * 0.2;
+                            v -= noiseBottom.get((mx + x) / 30.0, (mz + z) / 30.0);
                         }
 
                         v *= (sv - bias) * (1 / inv_bias);
 
                         if (v > 0.5) {
-                            pChunk.setBlockState(
-                                    new BlockPos(x, y, z),
-                                    Blocks.STONE.defaultBlockState(),
-                                    false
-                            );
+                            if (!would && y >= middleY) {
+                                pChunk.setBlockState(
+                                        new BlockPos(x, y, z),
+                                        Blocks.OBSIDIAN.defaultBlockState(),
+                                        false
+                                );
+                            } else {
+                                pChunk.setBlockState(
+                                        new BlockPos(x, y, z),
+                                        Blocks.STONE.defaultBlockState(),
+                                        false
+                                );
+                            }
                         }
                     }
                 }
