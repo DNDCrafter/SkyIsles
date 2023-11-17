@@ -52,12 +52,13 @@ public class SmallIsland extends SIStructure {
         double diameter = source.nextDouble() * 20 + 10;
         double orientation = source.nextDouble() * 2 * Math.PI;
         double oblonginess = source.nextDouble() / 2.0;
+        double spikeSize = source.nextDouble() * 5 + 10 + (diameter / 2);
         wobbleRange += diameter / 10;
         wobbleRate += diameter / 10;
 
         SINoiseSettings settings = new SINoiseSettings(
                 0, "simplex_amplitudes",
-                (List<Integer>) Arrays.asList(1, 1, 2, 1, 2, 0, 1),
+                Arrays.asList(1, 1, 2, 1, 2, 0, 1),
                 0.01, 0.01, 0.01, 1
         );
         NoiseWrapper wrapper = settings.create(source.nextLong());
@@ -79,33 +80,24 @@ public class SmallIsland extends SIStructure {
                 ) + wobbleStart;
                 ang = ang % (2 * Math.PI);
 
-                double c = Math.cos(ang + orientation);
-//                double s = Math.sin(ang);
-
-//                double relX = (x + mx) - cx;
-//                double relZ = (z + mz) - cz;
-//                double rx = relX * c + relZ * s;
-//                double rz = relX * s - relZ * c;
+                double c = Math.cos((ang - wobbleStart) + orientation);
 
                 double noise = (wrapper.get(ang * wobbleRate, 0) * wobbleRange) + diameter;
 
-                if ((ang / (2 * Math.PI)) > 0.75) {
-                    double pct = (ang / (2 * Math.PI)) - 0.75;
-                    pct *= 1 / 0.25;
-                    pct *= pct;
+                // TODO: I'd like to start smoothing this near the seam rather than constantly
+                if ((ang / (2 * Math.PI)) > 0) {
+                    double pct = (ang / (2 * Math.PI));
+                    pct = Math.pow(pct, 2);
 
                     noise = Mth.lerp(
                             pct,
                             noise,
-                            (wrapper.get(((pct / 4) * Math.PI * 2) * wobbleRate, 0) * wobbleRange) + diameter
+                            (wrapper.get((ang - Math.PI) * wobbleRate, 0) * wobbleRange) + diameter
                     );
                 }
 
-//                double aspect = (Math.abs(rx / rz));
-//                if (aspect > 1) aspect = 1 / aspect;
-//                noise *= 1 - (aspect * oblonginess);
-
-                noise *= 1 - (((c / 2) + 1) * oblonginess);
+                double absC = Math.abs(c);
+                noise *= 1 - ((absC / 2.0 + 0.5) * oblonginess);
 
                 if (dist < noise) {
                     chunk.setBlockState(
@@ -127,6 +119,16 @@ public class SmallIsland extends SIStructure {
                     for (int i = 0; i < hght; i++) {
                         chunk.setBlockState(
                                 new BlockPos(x, i, z),
+                                Blocks.STONE.defaultBlockState(),
+                                false
+                        );
+                    }
+
+                    dv = Math.pow(dv, 2.75);
+                    dv += 0.05;
+                    for (int i = 0; i < dv * spikeSize; i++) {
+                        chunk.setBlockState(
+                                new BlockPos(x, -i, z),
                                 Blocks.STONE.defaultBlockState(),
                                 false
                         );
