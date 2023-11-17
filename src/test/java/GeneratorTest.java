@@ -31,6 +31,13 @@ public class GeneratorTest {
     public static void main(String[] args) {
         JFrame frame = new JFrame();
 
+
+        Cell cell = new Cell(-1, 0);
+        int v = cell.modX(-48 + 23);
+        cell = new Cell(0, 0);
+        v = cell.modX(23);
+
+
         SINoiseSettings settings = new SINoiseSettings(
                 0, "simplex_amplitudes",
                 (List<Integer>) List.of(1, 1, 2, 1, 2, 0, 1, 0),
@@ -147,8 +154,8 @@ public class GeneratorTest {
 
                                 for (Cluster cluster : cell.clusters) {
                                     double dist = cluster.sumDist(wrapper, new Point(
-                                            wx / 16d,
-                                            wy / 16d
+                                            wx / 32d,
+                                            wy / 32d
                                     ));
 
                                     double d = dist / cluster.terrainRange / 1.5;

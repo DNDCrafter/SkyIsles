@@ -1,3 +1,5 @@
+package com.thelastflames.skyisles.chunk_generators.si;
+
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.PositionalRandomFactory;
 
@@ -5,11 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cell {
-    int x, z;
-    boolean isColossus = false;
-    List<Cluster> clusters = new ArrayList<>();
+    public final int x, z;
+    public boolean isColossus = false;
+    public final List<Cluster> clusters = new ArrayList<>();
 
-    int celSize = 48;
+    int celSize = 48 * 2;
 
     protected int modulate(int xv) {
         double d = xv / ((double) celSize);
@@ -25,18 +27,19 @@ public class Cell {
         this.z = modulate(chunkZ);
     }
 
+    protected Cell(boolean b, int chunkX, int chunkZ) {
+        this.x = chunkX;
+        this.z = chunkZ;
+    }
+
     public static Cell of(int celX, int celZ) {
-        Cell cell = new Cell(0, 0);
-        cell.x = celX;
-        cell.z = celZ;
-        return cell;
+        return new Cell(true, celX, celZ);
     }
 
     public void distrobute(PositionalRandomFactory factory) {
         RandomSource source = factory.fromHashOf("cell_" + x + "_" + z);
 
-//        isColossus = source.nextDouble() > 0.95;
-        isColossus = (x == 0 && z == 0);
+        isColossus = source.nextDouble() > 0.5;
         if (isColossus) {
             // subcells help mask rng bias
             int subCelSize = 8;
@@ -49,6 +52,7 @@ public class Cell {
 
             double centerX = source.nextDouble() + source.nextInt(subCelSize) + celX * subCelSize;
             double centerY = source.nextDouble() + source.nextInt(subCelSize) + celY * subCelSize;
+            current.yOffset = source.nextDouble() * 96;
 
             Point prev = new Point(centerX, centerY);
 
@@ -71,7 +75,7 @@ public class Cell {
         int subCelSize = 8;
         int subCels = celSize / subCelSize;
 
-        for (int i = 0; i < source.nextInt(1, isColossus ? 2 : 8); i++) {
+        for (int i = 0; i < source.nextInt(isColossus ? 8 : 16, isColossus ? 16 : 32); i++) {
             Cluster current = new Cluster((source.nextDouble() + 0.5) / 2.0, (source.nextDouble() + 0.5) * 1.5);
 
             int celX = source.nextInt(0, subCels);
@@ -79,6 +83,9 @@ public class Cell {
 
             double centerX = source.nextDouble() + source.nextInt(subCelSize) + celX * subCelSize;
             double centerY = source.nextDouble() + source.nextInt(subCelSize) + celY * subCelSize;
+            current.centerX = centerX;
+            current.centerY = centerY;
+            current.yOffset = source.nextDouble() * 96;
 
             Point prev = new Point(centerX, centerY);
 
@@ -142,21 +149,21 @@ public class Cell {
         ArrayList<Cluster> toRemove = new ArrayList<>();
         for (Cluster cluster : cell00.clusters) {
             for (Cluster cluster1 : clusters) {
-                if (cluster.distTo(cluster1, -48, -48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                if (cluster.distTo(cluster1, -celSize, -celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                     toRemove.add(cluster1);
                 }
             }
         }
         for (Cluster cluster : cell01.clusters) {
             for (Cluster cluster1 : clusters) {
-                if (cluster.distTo(cluster1, -48, 0) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                if (cluster.distTo(cluster1, -celSize, 0) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                     toRemove.add(cluster1);
                 }
             }
         }
         for (Cluster cluster : cell10.clusters) {
             for (Cluster cluster1 : clusters) {
-                if (cluster.distTo(cluster1, 0, -48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                if (cluster.distTo(cluster1, 0, -celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                     toRemove.add(cluster1);
                 }
             }
@@ -165,7 +172,7 @@ public class Cell {
         if (cell12.isColossus) {
             for (Cluster cluster : cell12.clusters) {
                 for (Cluster cluster1 : clusters) {
-                    if (cluster.distTo(cluster1, 0, 48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                    if (cluster.distTo(cluster1, 0, celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                         toRemove.add(cluster1);
                     }
                 }
@@ -174,7 +181,7 @@ public class Cell {
         if (cell22.isColossus) {
             for (Cluster cluster : cell22.clusters) {
                 for (Cluster cluster1 : clusters) {
-                    if (cluster.distTo(cluster1, 48, 48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                    if (cluster.distTo(cluster1, celSize, celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                         toRemove.add(cluster1);
                     }
                 }
@@ -183,7 +190,7 @@ public class Cell {
         if (cell21.isColossus) {
             for (Cluster cluster : cell21.clusters) {
                 for (Cluster cluster1 : clusters) {
-                    if (cluster.distTo(cluster1, 48, 0) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                    if (cluster.distTo(cluster1, celSize, 0) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                         toRemove.add(cluster1);
                     }
                 }
@@ -192,7 +199,7 @@ public class Cell {
         if (cell20.isColossus) {
             for (Cluster cluster : cell20.clusters) {
                 for (Cluster cluster1 : clusters) {
-                    if (cluster.distTo(cluster1, -48, 48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                    if (cluster.distTo(cluster1, -celSize, celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                         toRemove.add(cluster1);
                     }
                 }
@@ -201,7 +208,7 @@ public class Cell {
         if (cell02.isColossus) {
             for (Cluster cluster : cell02.clusters) {
                 for (Cluster cluster1 : clusters) {
-                    if (cluster.distTo(cluster1, 48, -48) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
+                    if (cluster.distTo(cluster1, celSize, -celSize) < (Math.max(cluster.obstructRange, cluster1.obstructRange))) {
                         toRemove.add(cluster1);
                     }
                 }
@@ -214,12 +221,10 @@ public class Cell {
     }
 
     public int modX(int i) {
-        // TODO: check
-        return Math.abs(x * 48 + i);
+        return i - (x * celSize * 16);
     }
 
     public int modZ(int i) {
-        // TODO: check
-        return Math.abs(z * 48 + i);
+        return i - (z * celSize * 16);
     }
 }
