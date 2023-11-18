@@ -46,15 +46,17 @@ public class SmallIsland extends SIStructure {
         int cx = start.x + 8;
         int cz = start.z + 8;
 
-        double wobbleStart = source.nextDouble() * 2 * Math.PI;
+        double radius = source.nextDouble() * 20 + 10;
         double wobbleRange = source.nextDouble() * 5;
+
         double wobbleRate = source.nextDouble() * 10 + 1;
-        double diameter = source.nextDouble() * 20 + 10;
+        wobbleRange += radius / 10;
+        wobbleRate += radius / 10;
+
+        double wobbleStart = source.nextDouble() * 2 * Math.PI;
         double orientation = source.nextDouble() * 2 * Math.PI;
         double oblonginess = source.nextDouble() / 2.0;
-        double spikeSize = source.nextDouble() * 5 + 10 + (diameter / 2);
-        wobbleRange += diameter / 10;
-        wobbleRate += diameter / 10;
+        double spikeSize = source.nextDouble() * 5 + 10 + (radius);
 
         SINoiseSettings settings = new SINoiseSettings(
                 0, "simplex_amplitudes",
@@ -63,7 +65,7 @@ public class SmallIsland extends SIStructure {
         );
         NoiseWrapper wrapper = settings.create(source.nextLong());
 
-        double sqrtDiam = (diameter + wobbleRange);
+        double sqrtDiam = (radius + wobbleRange);
 
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -82,7 +84,7 @@ public class SmallIsland extends SIStructure {
 
                 double c = Math.cos((ang - wobbleStart) + orientation);
 
-                double noise = (wrapper.get(ang * wobbleRate, 0) * wobbleRange) + diameter;
+                double noise = (wrapper.get(ang * wobbleRate, 0) * wobbleRange) + radius;
 
                 // TODO: I'd like to start smoothing this near the seam rather than constantly
                 if ((ang / (2 * Math.PI)) > 0) {
@@ -92,7 +94,7 @@ public class SmallIsland extends SIStructure {
                     noise = Mth.lerp(
                             pct,
                             noise,
-                            (wrapper.get((ang - Math.PI) * wobbleRate, 0) * wobbleRange) + diameter
+                            (wrapper.get((ang - Math.PI) * wobbleRate, 0) * wobbleRange) + radius
                     );
                 }
 
@@ -124,6 +126,7 @@ public class SmallIsland extends SIStructure {
                         );
                     }
 
+                    // TODO: make this better
                     dv = Math.pow(dv, 2.75);
                     dv += 0.05;
                     for (int i = 0; i < dv * spikeSize; i++) {

@@ -2,7 +2,6 @@ package com.thelastflames.skyisles.chunk_generators;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import com.thelastflames.skyisles.chunk_generators.noise.NoiseWrapper;
 import com.thelastflames.skyisles.chunk_generators.si.Cell;
 import com.thelastflames.skyisles.chunk_generators.si.Cluster;
 import com.thelastflames.skyisles.chunk_generators.si.Point;
@@ -103,19 +102,15 @@ public class SkyIslesChunkGenerator3 extends ChunkGenerator {
 
     @Override
     public CompletableFuture<ChunkAccess> fillFromNoise(Executor pExecutor, Blender pBlender, RandomState pRandom, StructureManager pStructureManager, ChunkAccess pChunk) {
-        int i = pChunk.getMinBuildHeight();
-        int j = Mth.floorDiv(i, 16);
-        int k = Mth.floorDiv(pChunk.getMaxBuildHeight(), 16);
-        return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> {
-            return this.doFill(pBlender, pStructureManager, pRandom, pChunk, j, k);
-        }), Util.backgroundExecutor()).whenCompleteAsync((p_224309_, p_224310_) -> {
+        return CompletableFuture.supplyAsync(Util.wrapThreadWithTaskName("wgen_fill_noise", () -> this.doFill(pBlender, pStructureManager, pRandom, pChunk)), Util.backgroundExecutor()).whenCompleteAsync((p_224309_, p_224310_) -> {
             for (LevelChunkSection levelchunksection1 : pChunk.getSections()) {
                 levelchunksection1.release();
             }
         }, pExecutor);
     }
 
-    private ChunkAccess doFill(Blender pBlender, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk, int pMinCellY, int pCellCountY) {
+    private ChunkAccess doFill(Blender pBlender, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk) {
+//        pStructureManager.structureCheck.structureTemplateManager.resourceManager;
         SmallIsland island = new SmallIsland();
         for (ChunkPos chunkPos : island.layout(
                 pRandom.oreRandom(),
@@ -155,7 +150,6 @@ public class SkyIslesChunkGenerator3 extends ChunkGenerator {
             states[i] = Blocks.AIR.defaultBlockState();
         return new NoiseColumn(pHeight.getMinBuildHeight(), states);
     }
-
 
     int px;
     int pz;
@@ -223,7 +217,7 @@ public class SkyIslesChunkGenerator3 extends ChunkGenerator {
 
     @Override
     public void createStructures(RegistryAccess pRegistryAccess, ChunkGeneratorStructureState pStructureState, StructureManager pStructureManager, ChunkAccess pChunk, StructureTemplateManager pStructureTemplateManager) {
-//        super.createStructures(pRegistryAccess, pStructureState, pStructureManager, pChunk, pStructureTemplateManager);
+        super.createStructures(pRegistryAccess, pStructureState, pStructureManager, pChunk, pStructureTemplateManager);
     }
 
     @Override
