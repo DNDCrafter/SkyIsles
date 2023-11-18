@@ -1,6 +1,7 @@
 package com.thelastflames.skyisles.mixins.debug;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.thelastflames.skyisles.client.debug.CloudTest;
 import com.thelastflames.skyisles.client.debug.MultiMaterialTest;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -22,5 +23,6 @@ public class DebugRenderers {
     @Inject(method = "renderLevel", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/LevelRenderer;checkPoseStack(Lcom/mojang/blaze3d/vertex/PoseStack;)V", ordinal = 0))
     public void doDraw(PoseStack pPoseStack, float pPartialTick, long pFinishNanoTime, boolean pRenderBlockOutline, Camera pCamera, GameRenderer pGameRenderer, LightTexture pLightTexture, Matrix4f pProjectionMatrix, CallbackInfo ci) {
         MultiMaterialTest.draw(minecraft, pCamera, pPoseStack, minecraft.renderBuffers().bufferSource());
+        CloudTest.draw(minecraft, pCamera, pPoseStack, minecraft.renderBuffers().bufferSource());
     }
 }

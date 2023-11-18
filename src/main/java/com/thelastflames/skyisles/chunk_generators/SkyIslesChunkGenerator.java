@@ -54,8 +54,6 @@ public class SkyIslesChunkGenerator extends ChunkGenerator {
 
     @Override
     public void buildSurface(WorldGenRegion pLevel, StructureManager pStructureManager, RandomState pRandom, ChunkAccess pChunk) {
-        if (true) return;
-
         int midY = (settings.maxY() - settings.minY()) / 2;
 
         for (int x = 0; x < 16; x++) {
